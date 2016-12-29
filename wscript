@@ -46,14 +46,15 @@ def options(opt):
 		opt.load('cs')
 	
 	opt.add_option('--build_type', dest='build_type', type='string', default='RELEASE', action='store', help='DEBUG, NATIVE, RELEASE')
+	opt.add_option('--bash_location', dest='bash_location', type='string', default='bash', action='store', help='Location of bash when compiling on Windows. Optional.')
 	opt.add_option('--no_server', dest='bldsv', default=True, action='store_false', help='True/False')
 	opt.add_option('--no_client', dest='bldcl', default=True, action='store_false', help='True/False')
 
 def configure(ctx):
-	
+
 	ctx.env.BUILD_SERVER = ctx.options.bldsv
 	ctx.env.BUILD_CLIENT = ctx.options.bldcl
-	
+
 	ctx.load('gcc')
 	ctx.load('g++')
 	if not plat_windows: # FIXME: windows users have to manually compile sharpsv due to some weird bug I don't fully understand
@@ -61,22 +62,22 @@ def configure(ctx):
 	
 	ctx.check(features='c cprogram', lib='z', uselib_store='ZLIB')
 	ctx.check(features='c cprogram', lib='dl', uselib_store='DL')
-	
+
 	if ctx.env.BUILD_CLIENT:
 		ctx.check(features='c cprogram', lib='jpeg', uselib_store='JPEG')
 		ctx.check(features='c cprogram', lib='png', uselib_store='PNG')
 	ctx.check(features='c cprogram', lib='pthread', uselib_store='PTHREAD')
-	
+
 	if plat_linux and ctx.env.BUILD_CLIENT:
 		ctx.check(features='c cprogram', lib='GL', uselib_store='GL')
 		ctx.check_cfg(path='sdl2-config', args='--cflags --libs', package='', uselib_store='SDL')
-		
+
 	elif plat_windows:
 		ctx.check(features='c cprogram', lib='ws2_32', uselib_store='WS2')
 		if ctx.env.BUILD_CLIENT:
 			ctx.check(features='c cprogram', lib='opengl32', uselib_store='GL')
 			ctx.check(features='c cprogram', lib='winmm', uselib_store='WMM')
-			ctx.check_cfg(path='bash sdl2-config', args='--cflags --libs', package='', uselib_store='SDL')
+			ctx.check_cfg(path=ctx.options.bash_location.upper() + ' sdl2-config', args='--cflags --libs', package='', uselib_store='SDL')
 	ctx.check_cfg(path='pkg-config', args='--cflags --libs', package='mono-2', uselib_store='MONO')
 	ctx.check_cfg(path='pkg-config', args='--cflags --libs', package='bullet', uselib_store='BULLET')
 	
