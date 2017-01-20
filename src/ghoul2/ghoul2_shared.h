@@ -25,8 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <map>
 
-#define MDXABONEDEF
-#include "rd-common/mdx_format.h"
+#include "ghoul2/mdx_format.h"
 #include "rd-common/tr_types.h"
 #include "qcommon/matcomp.h"
 #include "ghoul2/G2_gore.h"

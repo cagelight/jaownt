@@ -31,6 +31,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "bg_weapons.h"
 #include "anims.h"
 #include "bg_vehicles.h"
+#include "ghoul2/mdx_format.h"
 
 //these two defs are shared now because we do clientside ent parsing
 #define	MAX_SPAWN_VARS			64

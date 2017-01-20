@@ -269,7 +269,7 @@ def build(bld):
 		rdvan.env.cxxshlib_PATTERN = '%s_x86_64.' + module_end
 		
 	### RD-MODERN ###
-	
+		
 		rdmodern_files = bld.path.ant_glob('src/rd-modern/*.cpp')
 		rdmodern_files += bld.path.ant_glob('src/rd-common/*.cpp')
 		rdmodern_files += bld.path.ant_glob('src/ghoul2/*.cpp')
@@ -288,7 +288,7 @@ def build(bld):
 		)
 		
 		rdmodern.env.cxxshlib_PATTERN = '%s_x86_64.' + module_end
-	
+		
 	### C# SCRIPTING LIBRARY ###
 	if not plat_windows: # FIXME: windows users have to manually compile sharpsv due to some weird bug I don't fully understand
 		monolib_files = bld.path.ant_glob('src/sharp/sharpsv/*.cs')

@@ -26,6 +26,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "qcommon/q_shared.h"
+#include "ghoul2/mdx_format.h"
 
 #define Q3_INFINITE			16777216
 

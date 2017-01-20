@@ -2316,10 +2316,6 @@ int Q_irand(int value1, int value2);
 Ghoul2 Insert Start
 */
 
-typedef struct mdxaBone_s {
-	float		matrix[3][4];
-} mdxaBone_t;
-
 // For ghoul2 axis use
 
 typedef enum Eorientations
