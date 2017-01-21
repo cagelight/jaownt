@@ -95,3 +95,8 @@ void CM_SubmodelIndicies(int submodel, int * brushes, int * patches, int * brush
 // cm_obj.cpp
 int CM_GetModelVerticies(char const * name, vec3_t * points, int points_num);
 objModel_t * CM_LoadObj(char const * name);
+
+model_t * CM_GetModelByHandle ( qhandle_t handle );
+qhandle_t CM_RegisterModel ( char const * name );
+model_t * CM_RegisterModelDirect ( char const * name );
+void CM_ClearModels();

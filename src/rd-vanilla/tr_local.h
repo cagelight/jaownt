@@ -1030,8 +1030,8 @@ typedef struct trGlobals_s {
 	// put large tables at the end, so most elements will be
 	// within the +/32K indexed range on risc processors
 	//
-	model_t					*models[MAX_MOD_KNOWN];
-	int						numModels;
+//	model_t					*models[MAX_MOD_KNOWN];
+//	int						numModels;
 
 	world_t					bspModels[MAX_SUB_BSP];
 	int						numBSPModels;
@@ -1345,8 +1345,6 @@ void		RE_RegisterImages_Info_f(void);
 
 
 qboolean	R_GetEntityToken( char *buffer, int size );
-
-model_t		*R_AllocModel( void );
 
 void    	R_Init( void );
 

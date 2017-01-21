@@ -6,7 +6,34 @@
 #define GL_INDEX_TYPE		GL_UNSIGNED_INT
 typedef unsigned int glIndex_t;
 
+#define	CULL_IN		0		// completely unclipped
+#define	CULL_CLIP	1		// clipped by one or more planes
+#define	CULL_OUT	2		// completely outside the clipping planes
+
 #define LL(x) x=LittleLong(x)
+
+typedef enum {
+	SF_BAD,
+	SF_SKIP,				// ignore
+	SF_FACE,
+	SF_GRID,
+	SF_TRIANGLES,
+	SF_POLY,
+	SF_MD3,
+/*
+Ghoul2 Insert Start
+*/
+	SF_MDX,
+/*
+Ghoul2 Insert End
+*/
+	SF_FLARE,
+	SF_ENTITY,				// beams, rails, lightning, etc that can be determined by entity
+	SF_DISPLAY_LIST,
+
+	SF_NUM_SURFACE_TYPES,
+	SF_MAX = 0xffffffff			// ensures that sizeof( surfaceType_t ) == sizeof( int )
+} surfaceType_t;
 
 // a trMiniRefEntity_t has all the information passed in by
 // the client game, other info will come from it's parent main ref entity
@@ -112,13 +139,82 @@ typedef struct viewParms_s {
 	float		zFar;
 } viewParms_t;
 
+typedef struct frontEndCounters_s {
+	int		c_sphere_cull_patch_in, c_sphere_cull_patch_clip, c_sphere_cull_patch_out;
+	int		c_box_cull_patch_in, c_box_cull_patch_clip, c_box_cull_patch_out;
+	int		c_sphere_cull_md3_in, c_sphere_cull_md3_clip, c_sphere_cull_md3_out;
+	int		c_box_cull_md3_in, c_box_cull_md3_clip, c_box_cull_md3_out;
+
+	int		c_leafs;
+	int		c_dlightSurfaces;
+	int		c_dlightSurfacesCulled;
+} frontEndCounters_t;
+
 typedef struct trGlobals_s {
 	window_t				window;
 
 	viewParms_t				viewParms;
+	orientationr_t			ori;
 	trRefdef_t				refdef;
+	frontEndCounters_t		pc;
 	
 } trGlobals_t;
+
+class CRenderableSurface
+{
+public:
+#ifdef _G2_GORE
+	int				ident;
+#else
+	const int		ident;			// ident of this surface - required so the materials renderer knows what sort of surface this refers to
+#endif
+	CBoneCache 		*boneCache;
+	mdxmSurface_t	*surfaceData;	// pointer to surface data loaded into file - only used by client renderer DO NOT USE IN GAME SIDE - if there is a vid restart this will be out of wack on the game
+#ifdef _G2_GORE
+	float			*alternateTex;		// alternate texture coordinates.
+	void			*goreChain;
+
+	float			scale;
+	float			fade;
+	float			impactTime; // this is a number between 0 and 1 that dictates the progression of the bullet impact
+#endif
+
+#ifdef _G2_GORE
+	CRenderableSurface& operator= ( const CRenderableSurface& src )
+	{
+		ident	 = src.ident;
+		boneCache = src.boneCache;
+		surfaceData = src.surfaceData;
+		alternateTex = src.alternateTex;
+		goreChain = src.goreChain;
+
+		return *this;
+	}
+#endif
+
+CRenderableSurface():
+	ident(SF_MDX),
+	boneCache(0),
+#ifdef _G2_GORE
+	surfaceData(0),
+	alternateTex(0),
+	goreChain(0)
+#else
+	surfaceData(0)
+#endif
+	{}
+
+#ifdef _G2_GORE
+	void Init()
+	{
+		ident = SF_MDX;
+		boneCache=0;
+		surfaceData=0;
+		alternateTex=0;
+		goreChain=0;
+	}
+#endif
+};
 
 extern trGlobals_t tr;
 extern refimport_t * ri;

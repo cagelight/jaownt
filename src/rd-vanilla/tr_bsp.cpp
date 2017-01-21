@@ -1426,7 +1426,7 @@ static	void R_LoadSubmodels( lump_t *l, world_t &worldData, int index ) {
 	for ( i=0 ; i<count ; i++, in++, out++ ) {
 		model_t *model;
 
-		model = R_AllocModel();
+		model = new model_t; // FIXME HACK
 
 		assert( model != NULL );			// this should never happen
 		if ( model == NULL ) {

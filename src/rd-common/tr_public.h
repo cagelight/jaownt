@@ -346,7 +346,10 @@ typedef struct refimport_s {
 	bool			(*PD_Store)							( const char *name, const void *data, size_t size );
 	const void *	(*PD_Load)							( const char *name, size_t *size );
 	
-	objModel_t * 	(*CM_LoadObj)						( char const * name);
+	objModel_t * 	(*CM_LoadObj)						( char const * name );
+	model_t *		(*CM_GetModelByHandle)				( qhandle_t handle );
+	qhandle_t		(*CM_RegisterModel)					( char const * name );
+	model_t *		(*CM_RegisterModelDirect)			( char const * name );
 	
 } refimport_t;
 

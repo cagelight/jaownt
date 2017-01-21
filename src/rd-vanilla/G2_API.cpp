@@ -792,7 +792,7 @@ qboolean G2_ShouldRegisterServer(void)
 qhandle_t G2API_PrecacheGhoul2Model( const char *fileName )
 {
 	if ( G2_ShouldRegisterServer() )
-		return RE_RegisterServerModel( fileName );
+		return RE_RegisterModel( fileName );
 	else
 		return RE_RegisterModel( fileName );
 }
@@ -2827,7 +2827,7 @@ qboolean G2_TestModelPointers(CGhoul2Info *ghlInfo) // returns true if the model
 		if (ri->Cvar_VariableIntegerValue( "dedicated" ) ||
 			(G2_ShouldRegisterServer())) //supreme hackery!
 		{
-			ghlInfo->mModel = RE_RegisterServerModel(ghlInfo->mFileName);
+			ghlInfo->mModel = RE_RegisterModel(ghlInfo->mFileName);
 		}
 		else
 		{
@@ -2918,7 +2918,7 @@ qboolean G2_SetupModelPointers(CGhoul2Info *ghlInfo) // returns true if the mode
 			if (ri->Cvar_VariableIntegerValue( "dedicated" ) ||
 				(G2_ShouldRegisterServer())) //supreme hackery!
 			{
-				ghlInfo->mModel = RE_RegisterServerModel(ghlInfo->mFileName);
+				ghlInfo->mModel = RE_RegisterModel(ghlInfo->mFileName);
 			}
 			else
 			{

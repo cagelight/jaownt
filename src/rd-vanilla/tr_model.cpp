@@ -34,8 +34,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define	LS(x) x=LittleShort(x)
 #define	LF(x) x=LittleFloat(x)
 
-static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *name, qboolean &bAlreadyCached );
-static qboolean R_LoadObj (model_t *mod, char const * name);
 /*
 Ghoul2 Insert Start
 */
@@ -580,8 +578,11 @@ void RE_RegisterMedia_LevelLoadEnd(void)
 ** R_GetModelByHandle
 */
 model_t	*R_GetModelByHandle( qhandle_t index ) {
-	model_t		*mod;
+	//model_t		*mod;
+	
+	return ri->CM_GetModelByHandle(index);
 
+	/*
 	// out of range gets the defualt model
 	if ( index < 1 || index >= tr.numModels ) {
 		return tr.models[0];
@@ -590,13 +591,14 @@ model_t	*R_GetModelByHandle( qhandle_t index ) {
 	mod = tr.models[index];
 
 	return mod;
+	*/
 }
 
 //===============================================================================
 
 /*
 ** R_AllocModel
-*/
+
 model_t *R_AllocModel( void ) {
 	model_t		*mod;
 
@@ -611,6 +613,7 @@ model_t *R_AllocModel( void ) {
 
 	return mod;
 }
+*/
 
 /*
 Ghoul2 Insert Start
@@ -1009,6 +1012,7 @@ qboolean ServerLoadMDXM( model_t *mod, void *buffer, const char *mod_name, qbool
 	return qtrue;
 }
 
+
 /*
 ====================
 RE_RegisterServerModel
@@ -1032,6 +1036,8 @@ Ghoul2 Insert Start
 /*
 Ghoul2 Insert End
 */
+
+	assert(0); // HACK nobody should be using this anymore, but I can't remove it yet
 
 	if (!r_noServerGhoul2)
 	{ //keep it from choking when it gets to these checks in the g2 code. Registering all r_ cvars for the server would be a Bad Thing though.
@@ -1057,7 +1063,7 @@ Ghoul2 Insert End
 		}
 	}
 
-	if ( ( mod = R_AllocModel() ) == NULL ) {
+	if ( ( mod = new model_t ) == NULL ) { //FIXME HACK
 		return 0;
 	}
 
@@ -1180,22 +1186,97 @@ optimization to prevent disk rescanning if they are
 asked for again.
 ====================
 */
+
+static qboolean ShouldRegisterShaders(void) {
+	vm_t *currentVM = ri->GetCurrentVM();
+
+	if ( currentVM && currentVM->slot == VM_GAME )
+	{
+		if ( ri->Cvar_VariableIntegerValue( "cl_running" ) &&
+			ri->Com_TheHunkMarkHasBeenMade() && ShaderHashTableExists())
+		{ //if the hunk has been marked then we are now loading client assets so don't load on server.
+			return qtrue;
+		}
+
+		return qfalse;
+	}
+	return qtrue;
+}
+
+static void R_PrepareOBJ (model_t * mod) {
+	for (int i = 0; i < mod->obj->numSurfaces; i++) {
+		mod->obj->surfaces[i].ident = SF_OBJ;
+		if (ShouldRegisterShaders()) {
+			shader_t * sh = R_FindShader( mod->obj->surfaces[i].shader, lightmapsNone, stylesDefault, qtrue );
+			if ( sh->defaultShader ) {
+				mod->obj->surfaces[i].shaderIndex = 0;
+			} else {
+				mod->obj->surfaces[i].shaderIndex = sh->index;
+			}
+		} else {
+			mod->obj->surfaces[i].shaderIndex = 0;
+		}
+	}
+}
+
+static void R_PrepareMD3 (model_t * mod) {
+	for (int lod = 0; lod < mod->numLods; lod++) {
+		md3Surface_t * surf = (md3Surface_t *) ( (byte *)mod->md3[lod] + mod->md3[lod]->ofsSurfaces );
+		for ( int i = 0 ; i < mod->md3[lod]->numSurfaces ; i++) {
+			surf->ident = SF_MD3;
+			md3Shader_t		*shader;
+			shader = (md3Shader_t *) ( (byte *)surf + surf->ofsShaders );
+			for ( int j = 0 ; j < surf->numShaders ; j++, shader++ ) {
+				if (ShouldRegisterShaders()) {
+					shader_t	*sh;
+					sh = R_FindShader( shader->name, lightmapsNone, stylesDefault, qtrue );
+					if ( sh->defaultShader ) {
+						shader->shaderIndex = 0;
+					} else {
+						shader->shaderIndex = sh->index;
+					}
+				} else {
+					shader->shaderIndex = 0;
+				}
+			}
+			surf = (md3Surface_t *)( (byte *)surf + surf->ofsEnd );
+		}
+	}
+}
+
+static void R_PrepareMDXM (model_t * mod) {
+	mdxmHeader_t * & mdxm = mod->mdxm;
+	mdxmSurfHierarchy_t * surfInfo = (mdxmSurfHierarchy_t *)( (byte *)mdxm + mdxm->ofsSurfHierarchy);
+	for ( int i = 0 ; i < mod->mdxm->numSurfaces ; i++) {
+		if (ShouldRegisterShaders()) {
+			shader_t	*sh;
+			sh = R_FindShader( surfInfo->shader, lightmapsNone, stylesDefault, qtrue );
+			if ( sh->defaultShader ) {
+				surfInfo->shaderIndex = 0;
+			} else {
+				surfInfo->shaderIndex = sh->index;
+			}
+		} else {
+			surfInfo->shaderIndex = 0;
+		}
+		surfInfo = (mdxmSurfHierarchy_t *)( (byte *)surfInfo + (size_t)( &((mdxmSurfHierarchy_t *)0)->childIndexes[ surfInfo->numChildren ] ));
+	}
+	
+	mdxmLOD_t * lod = (mdxmLOD_t *) ( (byte *)mdxm + mdxm->ofsLODs );
+	for ( int l = 0 ; l < mdxm->numLODs ; l++) {
+		mdxmSurface_t * surf = (mdxmSurface_t *) ( (byte *)lod + sizeof (mdxmLOD_t) + (mdxm->numSurfaces * sizeof(mdxmLODSurfOffset_t)) );
+		for ( int i = 0 ; i < mdxm->numSurfaces ; i++) {
+			surf->ident = SF_MDX;
+			surf = (mdxmSurface_t *)( (byte *)surf + surf->ofsEnd );
+		}
+		lod = (mdxmLOD_t *)( (byte *)lod + lod->ofsEnd );
+	}
+}
+
 static qhandle_t RE_RegisterModel_Actual( const char *name ) {
-	model_t		*mod;
-	unsigned	*buf;
-	int			lod;
-	int			ident;
-	qboolean	loaded;
-//	qhandle_t	hModel;
-	int			numLoaded;
-/*
-Ghoul2 Insert Start
-*/
+
 	int			hash;
 	modelHash_t	*mh;
-/*
-Ghoul2 Insert End
-*/
 
 	if ( !name || !name[0] ) {
 		ri->Printf( PRINT_ALL, "RE_RegisterModel: NULL name\n" );
@@ -1207,36 +1288,13 @@ Ghoul2 Insert End
 		return 0;
 	}
 
-/*
-Ghoul2 Insert Start
-*/
-//	if (!tr.registered) {
-//		ri->Printf( PRINT_ALL, S_COLOR_YELLOW  "RE_RegisterModel (%s) called before ready!\n",name );
-//		return 0;
-//	}
-	//
-	// search the currently loaded models
-	//
 	hash = generateHashValue(name, FILE_HASH_SIZE);
 
-	//
-	// see if the model is already loaded
-	//
 	for (mh=mhHashTable[hash]; mh; mh=mh->next) {
 		if (Q_stricmp(mh->name, name) == 0) {
 			return mh->handle;
 		}
 	}
-
-//	for ( hModel = 1 ; hModel < tr.numModels; hModel++ ) {
-//		mod = tr.models[hModel];
-//		if ( !strcmp( mod->name, name ) ) {
-//			if( mod->type == MOD_BAD ) {
-//				return 0;
-//			}
-//			return hModel;
-//		}
-//	}
 
 	if (name[0] == '#')
 	{
@@ -1256,164 +1314,29 @@ Ghoul2 Insert Start
 
 		return 0;
 	}
-
-	if (name[0] == '*')
-	{	// don't create a bad model for a bsp model
-		if (Q_stricmp(name, "*default.gla"))
-		{
-			return 0;
-		}
-	}
-
-/*
-Ghoul2 Insert End
-*/
-
-	// allocate a new model_t
-
-	if ( ( mod = R_AllocModel() ) == NULL ) {
-		ri->Printf( PRINT_ALL, S_COLOR_YELLOW  "RE_RegisterModel: R_AllocModel() failed for '%s'\n", name);
-		return 0;
-	}
-
-	// only set the name after the model has been successfully loaded
-	Q_strncpyz( mod->name, name, sizeof( mod->name ) );
-
+	
 	// make sure the render thread is stopped
 	R_IssuePendingRenderCommands();
 	
-	if (strlen(name) > 4 && !strcmp(".obj", name + strlen(name) - 4)) {
-		loaded = R_LoadObj( mod, name );
-		if (!loaded) return 0;
-		RE_InsertModelIntoHash(name, mod);
-		return mod->index;
-	}
-
-	int iLODStart = 0;
-	if (strstr (name, ".md3")) {
-		iLODStart = MD3_MAX_LODS-1;	// this loads the md3s in reverse so they can be biased
-	}
-	mod->numLods = 0;
-
-	//
-	// load the files
-	//
-	numLoaded = 0;
-
-	for ( lod = iLODStart; lod >= 0 ; lod-- ) {
-		char filename[1024];
-
-		strcpy( filename, name );
-
-		if ( lod != 0 ) {
-			char namebuf[80];
-
-			if ( strrchr( filename, '.' ) ) {
-				*strrchr( filename, '.' ) = 0;
-			}
-			sprintf( namebuf, "_%d.md3", lod );
-			strcat( filename, namebuf );
-		}
-
-		qboolean bAlreadyCached = qfalse;
-		if (!RE_RegisterModels_GetDiskFile(filename, (void **)&buf, &bAlreadyCached))
-		{
-			continue;
-		}
-
-		//loadmodel = mod;	// this seems to be fairly pointless
-
-		// important that from now on we pass 'filename' instead of 'name' to all model load functions,
-		//	because 'filename' accounts for any LOD mangling etc so guarantees unique lookups for yet more
-		//	internal caching...
-		//
-		ident = *(unsigned *)buf;
-		if (!bAlreadyCached)
-		{
-			LL(ident);
-		}
-
-		switch (ident)
-		{
-			// if you add any new types of model load in this switch-case, tell me,
-			//	or copy what I've done with the cache scheme (-ste).
-			//
-			case MDXA_IDENT:
-				loaded = R_LoadMDXA( mod, buf, filename, bAlreadyCached );
-				break;
-
-			case MDXM_IDENT:
-				loaded = R_LoadMDXM( mod, buf, filename, bAlreadyCached );
-				break;
-
-			case MD3_IDENT:
-				loaded = R_LoadMD3( mod, lod, buf, filename, bAlreadyCached );
-				break;
-
-			default:
-				ri->Printf( PRINT_ALL, S_COLOR_YELLOW"RE_RegisterModel: unknown fileid for %s\n", filename);
-				goto fail;
-		}
-
-		if (!bAlreadyCached){	// important to check!!
-			ri->FS_FreeFile (buf);
-		}
-
-		if ( !loaded ) {
-			if ( lod == 0 ) {
-				goto fail;
-			} else {
-				break;
-			}
-		} else {
-			mod->numLods++;
-			numLoaded++;
-			// if we have a valid model and are biased
-			// so that we won't see any higher detail ones,
-			// stop loading them
-			if ( lod <= r_lodbias->integer ) {
-				break;
-			}
-		}
-	}
-
-	if ( numLoaded ) {
-		// duplicate into higher lod spots that weren't
-		// loaded, in case the user changes r_lodbias on the fly
-		for ( lod-- ; lod >= 0 ; lod-- ) {
-			mod->numLods++;
-			mod->md3[lod] = mod->md3[lod+1];
-		}
-
-/*
-Ghoul2 Insert Start
-*/
-
-#ifdef _DEBUG
-	if (r_noPrecacheGLA && r_noPrecacheGLA->integer && ident == MDXA_IDENT)
-	{ //I expect this will cause leaks, but I don't care because it's a debugging utility.
-		return mod->index;
-	}
-#endif
-
+	model_t * mod = ri->CM_RegisterModelDirect(name);
+	if (!mod) return 0;
 	RE_InsertModelIntoHash(name, mod);
+	
+	switch (mod->type) {
+		case MOD_OBJ:
+			R_PrepareOBJ(mod);
+			break;
+		case MOD_MESH:
+			R_PrepareMD3(mod);
+			break;
+		case MOD_MDXM:
+			R_PrepareMDXM(mod);
+			break;
+		default:
+			break;
+	}
 	return mod->index;
-/*
-Ghoul2 Insert End
-*/
-	}
-#ifdef _DEBUG
-	else {
-		ri->Printf( PRINT_ALL, S_COLOR_YELLOW"RE_RegisterModel: couldn't load %s\n", name);
-	}
-#endif
-
-fail:
-	// we still keep the model_t around, so if the model name is asked for
-	// again, we won't bother scanning the filesystem
-	mod->type = MOD_BAD;
-	RE_InsertModelIntoHash(name, mod);
-	return 0;
+	
 }
 
 
@@ -1432,217 +1355,6 @@ qhandle_t RE_RegisterModel( const char *name )
 
 	return q;
 }
-
-
-
-
-/*
-=================
-R_LoadMD3
-=================
-*/
-static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_name, qboolean &bAlreadyCached ) {
-	int					i, j;
-	md3Header_t			*pinmodel;
-	md3Surface_t		*surf;
-	int					version;
-	int					size;
-
-#ifdef Q3_BIG_ENDIAN
-	md3Frame_t			*frame;
-	md3Triangle_t		*tri;
-	md3St_t				*st;
-	md3XyzNormal_t		*xyz;
-	md3Tag_t			*tag;
-#endif
-
-
-	pinmodel= (md3Header_t *)buffer;
-	//
-	// read some fields from the binary, but only LittleLong() them when we know this wasn't an already-cached model...
-	//
-	version = pinmodel->version;
-	size	= pinmodel->ofsEnd;
-
-	if (!bAlreadyCached)
-	{
-		LL(version);
-		LL(size);
-	}
-
-	if (version != MD3_VERSION) {
-		ri->Printf( PRINT_ALL, S_COLOR_YELLOW  "R_LoadMD3: %s has wrong version (%i should be %i)\n",
-				 mod_name, version, MD3_VERSION);
-		return qfalse;
-	}
-
-	mod->type      = MOD_MESH;
-	mod->dataSize += size;
-
-	qboolean bAlreadyFound = qfalse;
-	mod->md3[lod] = (md3Header_t *) //Hunk_Alloc( size );
-										RE_RegisterModels_Malloc(size, buffer, mod_name, &bAlreadyFound, TAG_MODEL_MD3);
-
-	assert(bAlreadyCached == bAlreadyFound);	// I should probably eliminate 'bAlreadyFound', but wtf?
-
-	if (!bAlreadyFound)
-	{
-		// horrible new hackery, if !bAlreadyFound then we've just done a tag-morph, so we need to set the
-		//	bool reference passed into this function to true, to tell the caller NOT to do an ri->FS_Freefile since
-		//	we've hijacked that memory block...
-		//
-		// Aaaargh. Kill me now...
-		//
-		bAlreadyCached = qtrue;
-		assert( mod->md3[lod] == buffer );
-//		memcpy( mod->md3[lod], buffer, size );	// and don't do this now, since it's the same thing
-
-		LL(mod->md3[lod]->ident);
-		LL(mod->md3[lod]->version);
-		LL(mod->md3[lod]->numFrames);
-		LL(mod->md3[lod]->numTags);
-		LL(mod->md3[lod]->numSurfaces);
-		LL(mod->md3[lod]->ofsFrames);
-		LL(mod->md3[lod]->ofsTags);
-		LL(mod->md3[lod]->ofsSurfaces);
-		LL(mod->md3[lod]->ofsEnd);
-	}
-
-	if ( mod->md3[lod]->numFrames < 1 ) {
-		ri->Printf( PRINT_ALL, S_COLOR_YELLOW  "R_LoadMD3: %s has no frames\n", mod_name );
-		return qfalse;
-	}
-
-	if (bAlreadyFound)
-	{
-		return qtrue;	// All done. Stop, go no further, do not pass Go...
-	}
-
-#ifdef Q3_BIG_ENDIAN
-	// swap all the frames
-	frame = (md3Frame_t *) ( (byte *)mod->md3[lod] + mod->md3[lod]->ofsFrames );
-	for ( i = 0 ; i < mod->md3[lod]->numFrames ; i++, frame++) {
-		LF(frame->radius);
-		for ( j = 0 ; j < 3 ; j++ ) {
-			LF(frame->bounds[0][j]);
-			LF(frame->bounds[1][j]);
-			LF(frame->localOrigin[j]);
-		}
-	}
-
-	// swap all the tags
-	tag = (md3Tag_t *) ( (byte *)mod->md3[lod] + mod->md3[lod]->ofsTags );
-	for ( i = 0 ; i < mod->md3[lod]->numTags * mod->md3[lod]->numFrames ; i++, tag++) {
-		for ( j = 0 ; j < 3 ; j++ ) {
-			LF(tag->origin[j]);
-			LF(tag->axis[0][j]);
-			LF(tag->axis[1][j]);
-			LF(tag->axis[2][j]);
-		}
-	}
-#endif
-
-	// swap all the surfaces
-	surf = (md3Surface_t *) ( (byte *)mod->md3[lod] + mod->md3[lod]->ofsSurfaces );
-	for ( i = 0 ; i < mod->md3[lod]->numSurfaces ; i++) {
-        LL(surf->flags);
-        LL(surf->numFrames);
-        LL(surf->numShaders);
-        LL(surf->numTriangles);
-        LL(surf->ofsTriangles);
-        LL(surf->numVerts);
-        LL(surf->ofsShaders);
-        LL(surf->ofsSt);
-        LL(surf->ofsXyzNormals);
-        LL(surf->ofsEnd);
-
-		if ( surf->numVerts >= SHADER_MAX_VERTEXES ) {
-			Com_Error (ERR_DROP, "R_LoadMD3: %s has more than %i verts on %s (%i)",
-				mod_name, SHADER_MAX_VERTEXES - 1, surf->name[0] ? surf->name : "a surface", surf->numVerts );
-		}
-		if ( surf->numTriangles*3 >= SHADER_MAX_INDEXES ) {
-			Com_Error (ERR_DROP, "R_LoadMD3: %s has more than %i triangles on %s (%i)",
-				mod_name, ( SHADER_MAX_INDEXES / 3 ) - 1, surf->name[0] ? surf->name : "a surface", surf->numTriangles );
-		}
-
-		// change to surface identifier
-		surf->ident = SF_MD3;
-
-		// lowercase the surface name so skin compares are faster
-		Q_strlwr( surf->name );
-
-		// strip off a trailing _1 or _2
-		// this is a crutch for q3data being a mess
-		j = strlen( surf->name );
-		if ( j > 2 && surf->name[j-2] == '_' ) {
-			surf->name[j-2] = 0;
-		}
-        // register the shaders
-		md3Shader_t		*shader;
-        shader = (md3Shader_t *) ( (byte *)surf + surf->ofsShaders );
-        for ( j = 0 ; j < surf->numShaders ; j++, shader++ ) {
-            shader_t	*sh;
-
-            sh = R_FindShader( shader->name, lightmapsNone, stylesDefault, qtrue );
-			if ( sh->defaultShader ) {
-				shader->shaderIndex = 0;
-			} else {
-				shader->shaderIndex = sh->index;
-			}
-			RE_RegisterModels_StoreShaderRequest(mod_name, &shader->name[0], &shader->shaderIndex);
-        }
-
-#ifdef Q3_BIG_ENDIAN
-		// swap all the triangles
-		tri = (md3Triangle_t *) ( (byte *)surf + surf->ofsTriangles );
-		for ( j = 0 ; j < surf->numTriangles ; j++, tri++ ) {
-			LL(tri->indexes[0]);
-			LL(tri->indexes[1]);
-			LL(tri->indexes[2]);
-		}
-
-		// swap all the ST
-		st = (md3St_t *) ( (byte *)surf + surf->ofsSt );
-		for ( j = 0 ; j < surf->numVerts ; j++, st++ ) {
-			LF(st->st[0]);
-			LF(st->st[1]);
-		}
-
-		// swap all the XyzNormals
-		xyz = (md3XyzNormal_t *) ( (byte *)surf + surf->ofsXyzNormals );
-		for ( j = 0 ; j < surf->numVerts * surf->numFrames ; j++, xyz++ )
-		{
-			LS(xyz->xyz[0]);
-			LS(xyz->xyz[1]);
-			LS(xyz->xyz[2]);
-
-			LS(xyz->normal);
-		}
-#endif
-
-		// find the next surface
-		surf = (md3Surface_t *)( (byte *)surf + surf->ofsEnd );
-	}
-
-	return qtrue;
-}
-
-static qboolean R_LoadObj (model_t *mod, char const * name) {
-	mod->type = MOD_OBJ;
-	mod->obj = ri->CM_LoadObj(name);
-	if (!mod->obj) return qfalse;
-	for (int i = 0; i < mod->obj->numSurfaces; i++) {
-		mod->obj->surfaces[i].ident = SF_OBJ;
-		shader_t * sh = R_FindShader( mod->obj->surfaces[i].shader, lightmapsNone, stylesDefault, qtrue );
-		if ( sh->defaultShader ) {
-			mod->obj->surfaces[i].shaderIndex = 0;
-		} else {
-			mod->obj->surfaces[i].shaderIndex = sh->index;
-		}
-	}
-	return qtrue;
-}
-
 
 //=============================================================================
 /*
@@ -1685,7 +1397,6 @@ R_ModelInit
 */
 void R_ModelInit( void )
 {
-	model_t		*mod;
 
 	if(!CachedModels)
 	{
@@ -1693,18 +1404,20 @@ void R_ModelInit( void )
 	}
 
 	// leave a space for NULL model
-	tr.numModels = 0;
-	memset(mhHashTable, 0, sizeof(mhHashTable));
+	//tr.numModels = 0;
+	//memset(mhHashTable, 0, sizeof(mhHashTable));
 
+	/*
 	mod = R_AllocModel();
 	mod->type = MOD_BAD;
+	*/
 }
 
 extern void KillTheShaderHashTable(void);
 void RE_HunkClearCrap(void)
 { //get your dirty sticky assets off me, you damn dirty hunk!
 	KillTheShaderHashTable();
-	tr.numModels = 0;
+	//tr.numModels = 0;
 	memset(mhHashTable, 0, sizeof(mhHashTable));
 	tr.numShaders = 0;
 	tr.numSkins = 0;
@@ -1726,7 +1439,8 @@ void R_ModelFree(void)
 R_Modellist_f
 ================
 */
-void R_Modellist_f( void ) {
+void R_Modellist_f( void ) { // FIXME MAYBE?
+	/*
 	int		i, j;
 	model_t	*mod;
 	int		total;
@@ -1751,6 +1465,7 @@ void R_Modellist_f( void ) {
 		ri->Printf( PRINT_ALL, "\n%8i : %s\n", tr.world->dataSize, tr.world->name );
 	}
 #endif
+*/
 }
 
 

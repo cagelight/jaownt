@@ -265,6 +265,23 @@ Ghoul2 Insert End
 	qboolean	bspInstance;
 } model_t;
 
+typedef struct cLeaf_s {
+	int			cluster;
+	int			area;
+
+	ptrdiff_t	firstLeafBrush;
+	int			numLeafBrushes;
+
+	ptrdiff_t	firstLeafSurface;
+	int			numLeafSurfaces;
+} cLeaf_t;
+
+typedef struct cmodel_s {
+	vec3_t		mins, maxs;
+	cLeaf_t		leaf;			// submodels don't reference the main tree
+	int			firstNode;		// only for cmodel[0] (for the main and bsp instances)
+} cmodel_t;
+
 /*
 ==============================================================================
 

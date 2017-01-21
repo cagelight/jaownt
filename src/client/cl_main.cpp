@@ -630,6 +630,8 @@ void CL_ShutdownAll( qboolean shutdownRef ) {
 	cls.cgameStarted = qfalse;
 	cls.rendererStarted = qfalse;
 	cls.soundRegistered = qfalse;
+	
+	CM_ClearModels();
 }
 
 /*
@@ -2354,7 +2356,7 @@ static IHeapAllocator *GetG2VertSpaceServer( void ) {
 	return G2VertSpaceServer;
 }
 
-#define DEFAULT_RENDER_LIBRARY "rd-modern"
+#define DEFAULT_RENDER_LIBRARY "rd-vanilla"
 
 void CL_InitRef( void ) {
 	static refimport_t ri;
@@ -2471,6 +2473,9 @@ void CL_InitRef( void ) {
 	ri.PD_Load = PD_Load;
 	
 	ri.CM_LoadObj = CM_LoadObj;
+	ri.CM_RegisterModel = CM_RegisterModel;
+	ri.CM_RegisterModelDirect = CM_RegisterModelDirect;
+	ri.CM_GetModelByHandle = CM_GetModelByHandle;
 
 	ret = GetRefAPI( REF_API_VERSION, &ri );
 
