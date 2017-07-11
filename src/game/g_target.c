@@ -55,6 +55,7 @@ void Use_Target_Give( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 }
 
 void SP_target_give( gentity_t *ent ) {
+	ent->r.svFlags |= SVF_NOCLIENT;
 	ent->use = Use_Target_Give;
 }
 
@@ -82,6 +83,7 @@ void Use_target_remove_powerups( gentity_t *ent, gentity_t *other, gentity_t *ac
 }
 
 void SP_target_remove_powerups( gentity_t *ent ) {
+	ent->r.svFlags |= SVF_NOCLIENT;
 	ent->use = Use_target_remove_powerups;
 }
 
@@ -113,6 +115,7 @@ void Use_Target_Delay( gentity_t *ent, gentity_t *other, gentity_t *activator ) 
 
 void SP_target_delay( gentity_t *ent ) {
 	// check delay for backwards compatability
+	ent->r.svFlags |= SVF_NOCLIENT;
 	if ( !G_SpawnFloat( "delay", "0", &ent->wait ) ) {
 		G_SpawnFloat( "wait", "1", &ent->wait );
 	}
@@ -136,6 +139,7 @@ void Use_Target_Score (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 }
 
 void SP_target_score( gentity_t *ent ) {
+	ent->r.svFlags |= SVF_NOCLIENT;
 	if ( !ent->count ) {
 		ent->count = 1;
 	}
@@ -262,6 +266,7 @@ void Use_Target_Print (gentity_t *ent, gentity_t *other, gentity_t *activator)
 }
 
 void SP_target_print( gentity_t *ent ) {
+	ent->r.svFlags |= SVF_NOCLIENT;
 	ent->use = Use_Target_Print;
 }
 
@@ -312,6 +317,7 @@ void SP_target_speaker( gentity_t *ent ) {
 	char	buffer[MAX_QPATH];
 	char	*s;
 
+	ent->r.svFlags |= SVF_NOCLIENT;
 	G_SpawnFloat( "wait", "0", &ent->wait );
 	G_SpawnFloat( "random", "0", &ent->random );
 
@@ -454,6 +460,7 @@ void target_laser_start (gentity_t *self)
 
 void SP_target_laser (gentity_t *self)
 {
+	self->r.svFlags |= SVF_NOCLIENT;
 	// let everything else get spawned before we start firing
 	self->think = target_laser_start;
 	self->nextthink = level.time + FRAMETIME;
@@ -483,6 +490,7 @@ void target_teleporter_use( gentity_t *self, gentity_t *other, gentity_t *activa
 The activator will be teleported away.
 */
 void SP_target_teleporter( gentity_t *self ) {
+	self->r.svFlags |= SVF_NOCLIENT;
 	if (!self->targetname)
 		trap->Print("untargeted %s at %s\n", self->classname, vtos(self->s.origin));
 
@@ -543,6 +551,7 @@ void target_relay_use (gentity_t *self, gentity_t *other, gentity_t *activator) 
 }
 
 void SP_target_relay (gentity_t *self) {
+	self->r.svFlags |= SVF_NOCLIENT;
 	self->use = target_relay_use;
 	if ( self->spawnflags&128 )
 	{
@@ -562,6 +571,7 @@ void target_kill_use( gentity_t *self, gentity_t *other, gentity_t *activator ) 
 }
 
 void SP_target_kill( gentity_t *self ) {
+	self->r.svFlags |= SVF_NOCLIENT;
 	self->use = target_kill_use;
 }
 
@@ -569,6 +579,7 @@ void SP_target_kill( gentity_t *self ) {
 Used as a positional target for in-game calculation, like jumppad targets.
 */
 void SP_target_position( gentity_t *self ){
+	self->r.svFlags |= SVF_NOCLIENT;
 	G_SetOrigin( self, self->s.origin );
 	/*
 	G_SetAngles( self, self->s.angles );
@@ -585,6 +596,7 @@ Closest target_location in sight used for the location, if none
 in site, closest in distance
 */
 void SP_target_location( gentity_t *self ) {
+	self->r.svFlags |= SVF_NOCLIENT;
 	if ( self->targetname && self->targetname[0] ) {
 		SP_target_position( self );
 		return;
@@ -679,6 +691,7 @@ void target_counter_use( gentity_t *self, gentity_t *other, gentity_t *activator
 
 void SP_target_counter (gentity_t *self)
 {
+	self->r.svFlags |= SVF_NOCLIENT;
 	self->wait = -1;
 	if (!self->count)
 	{
@@ -767,6 +780,7 @@ void target_random_use(gentity_t *self, gentity_t *other, gentity_t *activator)
 
 void SP_target_random (gentity_t *self)
 {
+	self->r.svFlags |= SVF_NOCLIENT;
 	self->use = target_random_use;
 }
 
@@ -891,6 +905,7 @@ delay - how long to wait after use to run script
 void SP_target_scriptrunner( gentity_t *self )
 {
 	float v;
+	self->r.svFlags |= SVF_NOCLIENT;
 	if ( self->spawnflags & 128 )
 	{
 		self->flags |= FL_INACTIVE;
@@ -949,6 +964,7 @@ Will set the target(s) to be usable/triggerable
 */
 void SP_target_activate( gentity_t *self )
 {
+	self->r.svFlags |= SVF_NOCLIENT;
 	G_SetOrigin( self, self->s.origin );
 	self->use = target_activate_use;
 }
@@ -958,6 +974,7 @@ Will set the target(s) to be non-usable/triggerable
 */
 void SP_target_deactivate( gentity_t *self )
 {
+	self->r.svFlags |= SVF_NOCLIENT;
 	G_SetOrigin( self, self->s.origin );
 	self->use = target_deactivate_use;
 }
@@ -976,6 +993,7 @@ void SP_target_level_change( gentity_t *self )
 {
 	char *s;
 
+	self->r.svFlags |= SVF_NOCLIENT;
 	G_SpawnString( "mapname", "", &s );
 	self->message = G_NewString(s);
 
@@ -1010,6 +1028,7 @@ void SP_target_play_music( gentity_t *self )
 {
 	char *s;
 
+	self->r.svFlags |= SVF_NOCLIENT;
 	G_SetOrigin( self, self->s.origin );
 	if (!G_SpawnString( "music", "", &s ))
 	{

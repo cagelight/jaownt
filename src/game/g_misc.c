@@ -43,6 +43,7 @@ Used to group brushes together just for editor convenience.  They are turned int
 Used as a positional target for calculations in the utilities (spotlights, etc), but removed during gameplay.
 */
 void SP_info_camp( gentity_t *self ) {
+	self->r.svFlags |= SVF_NOCLIENT;
 	G_SetOrigin( self, self->s.origin );
 }
 
@@ -60,6 +61,7 @@ Used as a positional target for in-game calculation, like jumppad targets.
 target_position does the same thing
 */
 void SP_info_notnull( gentity_t *self ){
+	self->r.svFlags |= SVF_NOCLIENT;
 	G_SetOrigin( self, self->s.origin );
 }
 

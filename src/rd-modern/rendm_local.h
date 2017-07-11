@@ -37,6 +37,7 @@ namespace rendm {
 		void term();
 		
 		qhandle_t reg (char const *);
+		model_t * get(qhandle_t);
 	}
 	
 	namespace shader {

@@ -3538,6 +3538,7 @@ Ghoul2 Insert Start
 	else
 	{
 		Com_Printf("MD3 MODEL NPC'S ARE NOT SUPPORTED IN MP!\n");
+		
 		return qfalse;
 	}
 /*

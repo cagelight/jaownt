@@ -58,7 +58,7 @@ static void TRM_Cvars() {
 void TRM_Shutdown( qboolean destroyWindow, qboolean restarting  ) {
 	rendm::term();
 	if ( restarting ) {
-		SaveGhoul2InfoArray();
+		//SaveGhoul2InfoArray();
 	}
 	if (destroyWindow) ri->WIN_Shutdown();
 	R_ShutdownFonts();
@@ -116,7 +116,7 @@ qhandle_t TRM_RegisterModel( const char *name  ) {
 }
 
 qhandle_t TRM_RegisterServerModel( const char *name  ) {
-	return 0; //TODO
+	return rendm::model::reg(name); // FIXME -- do not make VAOs (am I sure I need this)
 }
 
 qhandle_t TRM_RegisterSkin( const char *name  ) {
@@ -675,7 +675,7 @@ skin_t * TRM_GetSkinByHandle(qhandle_t) {
 }
 
 model_t * TRM_GetModelByHandle( qhandle_t hModel ) {
-	return nullptr;
+	return rendm::model::get(hModel);
 }
 
 float ProjectRadius( float r, vec3_t location )

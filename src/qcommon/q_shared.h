@@ -956,6 +956,7 @@ float DistanceHorizontalSquared( const vec3_t p1, const vec3_t p2 );
 void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
 void VectorRotate( const vec3_t in, matrix3_t matrix, vec3_t out );
 int Q_log2(int val);
+void VectorLerp(vec3_t in1, vec3_t in2, float lerp, vec3_t out);
 
 qboolean Q_isnan(float f);
 float Q_acos(float c);
