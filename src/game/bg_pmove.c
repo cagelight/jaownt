@@ -746,7 +746,7 @@ void PM_HoverTrace( void )
 					{
 						wakeOrg[2] = pm->ps->origin[2];
 					}
-					#ifdef _GAME //yeah, this is kind of crappy and makes no use of prediction whatsoever
+					#ifdef _GAGME //yeah, this is kind of crappy and makes no use of prediction whatsoever
 						if ( pVeh->m_pVehicleInfo->iWakeFX )
 						{
 							//G_PlayEffectID( pVeh->m_pVehicleInfo->iWakeFX, wakeOrg, fxAxis[0] );
@@ -1103,6 +1103,56 @@ Handles user intended acceleration
 */
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel )
 {
+	
+	if (bg_oldmove.integer) {
+		int			i;
+		float		addspeed, accelspeed, currentspeed;
+
+		currentspeed = DotProduct (pm->ps->velocity, wishdir);
+		addspeed = wishspeed - currentspeed;
+		if (addspeed <= 0 && pm->ps->clientNum < MAX_CLIENTS) {
+			return;
+		}
+
+		if (addspeed < 0)
+		{
+			accelspeed = (-accel)*pml.frametime*wishspeed;
+			if (accelspeed < addspeed) {
+				accelspeed = addspeed;
+			}
+		}
+		else
+		{
+			accelspeed = accel*pml.frametime*wishspeed;
+			if (accelspeed > addspeed) {
+				accelspeed = addspeed;
+			}
+		}
+
+		for (i=0 ; i<3 ; i++) {
+			pm->ps->velocity[i] += accelspeed*wishdir[i];
+		}
+	} else {
+		vec3_t		wishVelocity;
+		vec3_t		pushDir;
+		float		pushLen;
+		float		canPush;
+
+		VectorScale( wishdir, wishspeed, wishVelocity );
+		VectorSubtract( wishVelocity, pm->ps->velocity, pushDir );
+		pushLen = VectorNormalize( pushDir );
+
+		canPush = accel*pml.frametime*wishspeed;
+		if (canPush > pushLen) {
+			canPush = pushLen;
+		}
+
+		VectorMA( pm->ps->velocity, canPush, pushDir, pm->ps->velocity );
+	}
+	
+
+	
+	/*
 	if (pm->gametype != GT_SIEGE
 		|| pm->ps->m_iVehicleNum
 		|| pm->ps->clientNum >= MAX_CLIENTS
@@ -1154,6 +1204,7 @@ static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel )
 
 		VectorMA( pm->ps->velocity, canPush, pushDir, pm->ps->velocity );
 	}
+	*/
 }
 
 
@@ -4214,6 +4265,8 @@ static void PM_GroundTrace( void ) {
 		pm->ps->pm_flags &= ~(PMF_TIME_WATERJUMP | PMF_TIME_LAND);
 		pm->ps->pm_time = 0;
 	}
+	
+	PM_CrashLand();
 
 	if ( pm->ps->groundEntityNum == ENTITYNUM_NONE ) {
 		// just hit the ground
@@ -10207,6 +10260,15 @@ void PmoveSingle (pmove_t *pmove) {
 	int savedGravity = 0;
 
 	pm = pmove;
+	
+#ifdef _GAME // TODO -- prediction in CGAME
+	G_Phys_SetClientCrouched((gentity_t *)pm->baseEnt, pm->cmd.upmove < 0);
+	if (pm->cmd.forwardmove || pm->cmd.rightmove) {
+		G_Phys_Set_Friction((gentity_t *)pm->baseEnt, bg_phys_clfric_move.value);
+	} else {
+		G_Phys_Set_Friction((gentity_t *)pm->baseEnt, bg_phys_clfric_stop.value);
+	}
+#endif
 
 	if (pm->cmd.buttons & BUTTON_ATTACK && pm->cmd.buttons & BUTTON_USE_HOLDABLE)
 	{

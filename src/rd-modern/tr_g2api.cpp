@@ -1,6 +1,8 @@
 #include "tr_local.h"
 #include "rendm_local.h"
 
+#include "ghoul2/g2_local.h"
+
 /* GHOUL2 REWRITE (this is impossible) */
 
 #define TOIMPLEMENT printf("IMPLEMENT THIS FUNCTION: %s\n", __PRETTY_FUNCTION__);
@@ -24,7 +26,8 @@ qboolean G2API_IsGhoul2InfovValid (CGhoul2Info_v& ghoul2) {
 	return qfalse;
 }
 
-int G2API_InitGhoul2Model(CGhoul2Info_v * * ghoul2Ptr, char const * fileName, int modelIndex, qhandle_t customSkin = NULL_HANDLE, qhandle_t customShader = NULL_HANDLE, int modelFlags = 0, int lodBias = 0) {
+int G2API_InitGhoul2Model(CGhoul2Info_v * * ghoul2Ptr, char const * fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, int modelFlags, int lodBias) {
+	
 	auto mh = rendm::model::reg(fileName);
 	return mh;
 }
@@ -84,7 +87,7 @@ int G2API_AddSurface(CGhoul2Info * ghlInfo, int surfaceNumber, int polyNumber, f
 	return 0;
 }
 
-qboolean G2API_SetBoneAnim(CGhoul2Info_v &ghoul2, const int modelIndex, char const * boneName, const int startFrame, const int endFrame, const int flags, const float animSpeed, const int currentTime, const float setFrame = -1, const int blendTime = -1) {
+qboolean G2API_SetBoneAnim(CGhoul2Info_v &ghoul2, const int modelIndex, char const * boneName, const int startFrame, const int endFrame, const int flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime) {
 	TOIMPLEMENT
 	return qfalse;
 }
@@ -254,7 +257,7 @@ char * G2API_GetGLAName(CGhoul2Info_v &ghoul2, int modelIndex) {
 	return va("%s", "not implemented");
 }
 
-qboolean G2API_SetBoneAnglesMatrix(CGhoul2Info * ghlInfo, char const * boneName, const mdxaBone_t &matrix, const int flags, qhandle_t * modelList, int blendTime = 0, int currentTime = 0) {
+qboolean G2API_SetBoneAnglesMatrix(CGhoul2Info * ghlInfo, char const * boneName, const mdxaBone_t &matrix, const int flags, qhandle_t * modelList, int blendTime, int currentTime) {
 	TOIMPLEMENT
 	return qfalse;
 }

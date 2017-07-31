@@ -1968,12 +1968,15 @@ void SV_BindGame( void ) {
 		gi.Phys_Object_Create_From_Obj			= Phys_Object_Create_From_Obj;
 		gi.Phys_Object_Create_From_BModel		= Phys_Object_Create_From_BModel;
 		gi.Phys_Object_Create_Capsule			= Phys_Object_Create_Capsule;
+		gi.Phys_Object_Create_Cylinder			= Phys_Object_Create_Cylinder;
 		gi.Phys_Object_Get_Origin				= Phys_Object_Get_Origin;
 		gi.Phys_Object_Set_Origin				= Phys_Object_Set_Origin;
 		gi.Phys_Object_Get_Rotation				= Phys_Object_Get_Rotation;
 		gi.Phys_Object_Set_Rotation				= Phys_Object_Set_Rotation;
 		gi.Phys_Object_Get_Properties			= Phys_Object_Get_Properties;
 		gi.Phys_Object_Set_Properties			= Phys_Object_Set_Properties;
+		gi.Phys_Object_Get_Transform			= Phys_Object_Get_Transform;
+		gi.Phys_Object_Set_Transform			= Phys_Object_Set_Transform;
 		gi.Phys_Object_Force					= Phys_Object_Force;
 		gi.Phys_Object_Impulse					= Phys_Object_Impulse;
 		gi.Phys_Obj_Set_Linear_Velocity			= Phys_Obj_Set_Linear_Velocity;

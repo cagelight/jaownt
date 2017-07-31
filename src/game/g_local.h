@@ -411,6 +411,8 @@ struct gentity_s {
 	
 	// Phys
 	phys_object_t * phys;
+	phys_object_t * phys2; // used for ducking clients
+	qboolean phys_is_crouched;
 	/*
 	qboolean phys_post_do_vellerp;
 	vec3_t phys_post_target_velocity;
@@ -1565,12 +1567,16 @@ void G_Phys_Frame ();
 
 void G_Phys_Upd_Res();
 void G_Phys_Upd_Grav();
-void G_Phys_Upd_ClF();
+//void G_Phys_Upd_ClF();
+
+void G_Phys_Set_Friction(gentity_t * ent, float f);
 
 void G_Phys_UpdateEnt(gentity_t * ent);
 
 void G_Phys_AddBMover(gentity_t * mover);
 void G_Phys_AddClientCapsule(gentity_t * ent);
+
+void G_Phys_SetClientCrouched(gentity_t * ent, qboolean);
 
 void G_Phys_Remove(gentity_t * ent);
 

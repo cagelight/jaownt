@@ -42,9 +42,12 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #endif
 
 XCVAR_DEF( bg_aircontrol,				"1",			NULL,				CVAR_SYSTEMINFO|CVAR_ARCHIVE,					qtrue ) // TODO
-XCVAR_DEF( bg_aircontrolzerog,			"0.20",			NULL,				CVAR_SYSTEMINFO|CVAR_ARCHIVE,					qtrue )
+XCVAR_DEF( bg_aircontrolzerog,			"1",			NULL,				CVAR_SYSTEMINFO|CVAR_ARCHIVE,					qtrue )
 XCVAR_DEF( bg_fighterAltControl,		"0",			NULL,				CVAR_SYSTEMINFO,								qtrue )
 XCVAR_DEF( bg_infammo,					"0",			NULL,				CVAR_SYSTEMINFO|CVAR_ARCHIVE,					qtrue )
+XCVAR_DEF( bg_phys_clfric_move,			"0.3",			NULL,				CVAR_SYSTEMINFO|CVAR_ARCHIVE,					qtrue )
+XCVAR_DEF( bg_phys_clfric_stop,			"2.5",			NULL,				CVAR_SYSTEMINFO|CVAR_ARCHIVE,					qtrue )
 XCVAR_DEF( bg_superweapons,				"1",			NULL,				CVAR_SYSTEMINFO|CVAR_ARCHIVE,					qtrue )
+XCVAR_DEF( bg_oldmove,					"0",			NULL,				CVAR_SYSTEMINFO|CVAR_ARCHIVE,					qtrue )
 
 #undef XCVAR_DEF

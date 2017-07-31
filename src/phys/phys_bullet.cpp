@@ -75,17 +75,15 @@ struct phys_object_s {
 			body->setActivationState( ACTIVE_TAG );
 		}
 		
-		if (properties.contents && is_disabled) {
+		if (properties.contents && is_disabled && !properties.disabled) {
 			is_disabled = false;
 			parent->addRigidBody(body);
-		} else if (!properties.contents && !is_disabled) {
+		} else if ((properties.disabled || !properties.contents) && !is_disabled) {
 			is_disabled = true;
 			parent->removeRigidBody(body);
-		}
-			
-		if (!properties.contents && body->getActivationState() != DISABLE_SIMULATION) {
 			body->setActivationState( DISABLE_SIMULATION );
 		}
+			
 	}
 	
 	~phys_object_s() {
@@ -185,6 +183,7 @@ static void bullet_world_substep_cb(btDynamicsWorld *world, btScalar timeStep) {
 			}
 		}
 		
+		if (pA->properties.disabled || pB->properties.disabled) continue;
 		phys_collision_t col;
 		col.A = pA;
 		col.B = pB;
@@ -368,6 +367,7 @@ void Phys_World_Add_Current_Map(phys_world_t * world, void * world_token) {
 		0,
 		qfalse,
 		qfalse,
+		qfalse,
 		CONTENTS_SOLID,
 		world_token,
 	};
@@ -458,8 +458,8 @@ phys_object_t * Phys_Object_Create_Box(phys_world_t * w, vec3_t mins, vec3_t max
 	btRigidBody::btRigidBodyConstructionInfo CI {obj->properties.mass, obj->motion_state, obj->shape, obj->inertia};
 	obj->body = new btRigidBody {CI};
 	
-	obj->set_properties();
 	bullet_world_add_object(w, obj);
+	obj->set_properties();
 	
 	return obj;
 }
@@ -495,8 +495,45 @@ phys_object_t * Phys_Object_Create_Capsule(phys_world_t * w, float cylinder_heig
 	btRigidBody::btRigidBodyConstructionInfo CI {obj->properties.mass, obj->motion_state, obj->shape, obj->inertia};
 	obj->body = new btRigidBody {CI};
 	
-	obj->set_properties();
 	bullet_world_add_object(w, obj);
+	obj->set_properties();
+	
+	return obj;
+}
+
+phys_object_t * Phys_Object_Create_Cylinder(phys_world_t * w, float cylinder_height, float radius, float v_center_offs, phys_transform_t * initial_transform, phys_properties_t * properties) {
+	phys_object_t * obj = new phys_object_t {w->world};
+	
+	obj->properties = *properties;
+	
+	VectorSet(obj->properties.mins, -radius, -radius, - (cylinder_height / 2 + radius));
+	VectorSet(obj->properties.mins, radius, radius, (cylinder_height / 2 + radius));
+	
+	if (v_center_offs) {
+		btCompoundShape * cmp = new btCompoundShape;
+		btCylinderShapeZ * cyl = new btCylinderShapeZ { btVector3 {radius, radius, cylinder_height / 2} };
+		cmp->addChildShape( btTransform { btQuaternion {0, 0, 0, 1}, btVector3 {0, 0, v_center_offs} }, cyl );
+		obj->shape = cmp;
+		obj->is_compound = true;
+	} else {
+		btCylinderShapeZ * cyl = new btCylinderShapeZ { btVector3 {radius, radius, cylinder_height / 2} };
+		obj->shape = cyl;
+	}
+	
+	if (obj->properties.mass < 0) {
+		obj->properties.mass = -obj->properties.mass * ((M_PI * pow(radius, 2) * cylinder_height) + ( (4.0f/3.0f) * M_PI * pow(radius, 3) ));
+	}
+	
+	obj->motion_state = new btDefaultMotionState { btTransform { 
+		btQuaternion { initial_transform->angles[0] * d2r_mult, initial_transform->angles[2] * d2r_mult, initial_transform->angles[1] * d2r_mult }, 
+		btVector3 {initial_transform->origin[0], initial_transform->origin[1], initial_transform->origin[2]} } };
+	
+	obj->shape->calculateLocalInertia(obj->properties.mass, obj->inertia);
+	btRigidBody::btRigidBodyConstructionInfo CI {obj->properties.mass, obj->motion_state, obj->shape, obj->inertia};
+	obj->body = new btRigidBody {CI};
+	
+	bullet_world_add_object(w, obj);
+	obj->set_properties();
 	
 	return obj;
 }
@@ -640,9 +677,8 @@ phys_object_t * Phys_Object_Create_From_Obj(phys_world_t * world, char const * p
 	btRigidBody::btRigidBodyConstructionInfo CI {no->properties.mass, no->motion_state, no->shape, no->inertia};
 	no->body = new btRigidBody {CI};
 	
-	no->set_properties();
-	
 	bullet_world_add_object(world, no);
+	no->set_properties();
 	
 	return no;
 }
@@ -705,9 +741,8 @@ phys_object_t * Phys_Object_Create_From_BModel(phys_world_t * world, int modeli,
 	btRigidBody::btRigidBodyConstructionInfo CI {no->properties.mass, no->motion_state, no->shape, no->inertia};
 	no->body = new btRigidBody {CI};
 	
-	no->set_properties();
-	
 	bullet_world_add_object(world, no);
+	no->set_properties();
 	
 	return no;
 }
@@ -766,6 +801,28 @@ phys_properties_t * Phys_Object_Get_Properties(phys_object_t * obj ) {
 
 void Phys_Object_Set_Properties(phys_object_t * obj) {
 	obj->set_properties();
+}
+
+void Phys_Object_Get_Transform(phys_object_t * obj, phys_transform_t * copyto) {
+	btTransform trans;
+	if (obj->properties.kinematic) obj->motion_state->getWorldTransform(trans);
+	else trans = obj->body->getWorldTransform();
+	
+	btVector3 & origin = trans.getOrigin();
+	VectorCopy(origin, copyto->origin);
+	btMatrix3x3 { trans.getRotation() }.getEulerYPR(copyto->angles[1], copyto->angles[0], copyto->angles[2]);
+}
+
+void Phys_Object_Set_Transform(phys_object_t * obj, phys_transform_t * copyfrom) {
+	btTransform trans;
+	if (obj->properties.kinematic) obj->motion_state->getWorldTransform(trans);
+	else trans = obj->body->getWorldTransform();
+	
+	trans.setOrigin( { copyfrom->origin[0], copyfrom->origin[1], copyfrom->origin[2] } );
+	trans.setRotation( btQuaternion {copyfrom->angles[0] * d2r_mult, copyfrom->angles[2] * d2r_mult, copyfrom->angles[1] * d2r_mult} );
+	
+	if (obj->properties.kinematic) obj->motion_state->setWorldTransform(trans);
+	else obj->body->setWorldTransform(trans);
 }
 
 void Phys_Object_Force(phys_object_t * obj, float * lin, float * ang) {

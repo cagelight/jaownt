@@ -1179,6 +1179,8 @@ void NPC_Begin (gentity_t *ent)
 		//G_MatchPlayerWeapon( ent );
 		//rwwFIXMEFIXME: Use this? Probably doesn't really matter for MP.
 	}
+	
+	G_Phys_AddClientCapsule(ent);
 
 	ClientThink( ent->s.number, &ucmd );
 
