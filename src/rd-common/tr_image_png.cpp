@@ -206,11 +206,14 @@ struct PNGFileReader
 
 		// While modern OpenGL can handle non-PoT textures, it's faster to handle only PoT
 		// so that the graphics driver doesn't have to fiddle about with the texture when uploading.
+		
+		/*
 		if ( !IsPowerOfTwo (width_) || !IsPowerOfTwo (height_) )
 		{
 			ri->Printf (PRINT_ERROR, "Width or height is not a power-of-two.\n");
 			return 0;
 		}
+		*/
 
 		// This function is equivalent to using what used to be LoadPNG32. LoadPNG8 also existed,
 		// but this only seemed to be used by the RMG system which does not work in JKA. If this

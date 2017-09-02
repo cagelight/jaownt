@@ -1,6 +1,6 @@
 #include "g_local.h"
 
-static phys_world_t * gworld = NULL;
+phys_world_t * gworld = NULL;
 static int last_time = 0;
 
 static vec3_t nullvec = {0, 0, 0};
@@ -284,7 +284,7 @@ void G_Phys_AddClientCapsule(gentity_t * ent) {
 	if (ent->phys) trap->Phys_World_Remove_Object(gworld, ent->phys);
 	if (ent->phys2) trap->Phys_World_Remove_Object(gworld, ent->phys2);
 	
-	trap->Print("%s", ent->classname);
+	//trap->Print("%s", ent->classname);
 	
 	props.mass = -1;
 	props.friction = bg_phys_clfric_stop.value;
@@ -343,7 +343,7 @@ static size_t const testmodels_num = sizeof(testmodels) / sizeof(char const *);
 void G_TEST_PhysTestEnt(vec3_t pos) {
 	gentity_t * physent = G_Spawn();
 	physent->s.eType = ET_PROP;
-	physent->r.contents = MASK_PLAYERSOLID;
+	physent->r.contents = MASK_SOLID;
 	//physent->r.svFlags |= SVF_BROADCAST;
 	
 	VectorCopy(pos, trans.origin);

@@ -1561,6 +1561,8 @@ void G_Sharp_Event_Cmd (gentity_t * ent, char const * cmd);
 void G_SharpCmd(gentity_t * ent, sharpCmd_t cmde);
 
 // g_phys.c
+extern phys_world_t * gworld;
+
 void G_Phys_Init ();
 void G_Phys_Shutdown ();
 void G_Phys_Frame ();

@@ -251,6 +251,7 @@ def build(bld):
 	### RD-VANILLA ###
 	
 		rdvan_files = bld.path.ant_glob('src/rd-vanilla/*.cpp')
+		rdvan_files += bld.path.ant_glob('src/rd-vanilla/glad.c')
 		rdvan_files += bld.path.ant_glob('src/rd-common/*.cpp')
 		rdvan_files += bld.path.ant_glob('src/ghoul2/*.cpp')
 		rdvan_files += bld.path.ant_glob('src/qcommon/matcomp.cpp')
@@ -258,7 +259,7 @@ def build(bld):
 		rdvan_files += bld.path.ant_glob('src/qcommon/q_shared.cpp')
 		
 		rdvan = bld (
-			features = 'cxx cxxshlib',
+			features = 'c cxx cshlib cxxshlib',
 			target = 'rd-vanilla',
 			includes = ['src', 'src/rd-vanilla'],
 			source = rdvan_files,

@@ -1246,6 +1246,7 @@ typedef enum {
 	ET_TERRAIN,
 	ET_FX,
 	ET_PROP,
+	ET_POSTER,
 
 	ET_EVENTS				// any of the EV_* events can be added freestanding
 							// by setting eType to ET_EVENTS + eventNum

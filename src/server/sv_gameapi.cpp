@@ -1983,6 +1983,7 @@ void SV_BindGame( void ) {
 		gi.Phys_Obj_Get_Linear_Velocity			= Phys_Obj_Get_Linear_Velocity;
 		gi.Phys_Obj_Set_Angular_Velocity		= Phys_Obj_Set_Angular_Velocity;
 		gi.Phys_Obj_Get_Angular_Velocity		= Phys_Obj_Get_Angular_Velocity;
+		gi.Phys_Obj_Weld						= Phys_Obj_Weld;
 
 		GetGameAPI = (GetGameAPI_t)gvm->GetModuleAPI;
 		ret = GetGameAPI( GAME_API_VERSION, &gi );

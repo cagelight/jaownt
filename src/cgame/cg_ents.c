@@ -1831,6 +1831,30 @@ Ghoul2 Insert End
 
 /*
 ==================
+CG_Poster
+==================
+*/
+
+static void CG_Poster( centity_t *cent ) {
+	
+	refEntity_t ent;
+	entityState_t * s1;
+	
+	memset (&ent, 0, sizeof(ent));
+
+	ent.shaderRGBA[0] = cent->currentState.customRGBA[0];
+	ent.shaderRGBA[1] = cent->currentState.customRGBA[1];
+	ent.shaderRGBA[2] = cent->currentState.customRGBA[2];
+	ent.shaderRGBA[3] = cent->currentState.customRGBA[3];
+	
+	ent.customShader = cgs.gameModels[cent->currentState.modelindex];
+	
+	AnglesToAxis( cent->lerpAngles, ent.axis );
+	
+}
+
+/*
+==================
 CG_Speaker
 
 Speaker entities can automatically play sounds
@@ -3386,6 +3410,9 @@ Ghoul2 Insert End
 		break;
 	case ET_BODY:
 		CG_General( cent );
+		break;
+	case ET_POSTER:
+		CG_Poster( cent );
 		break;
 	}
 }

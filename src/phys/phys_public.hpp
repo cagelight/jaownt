@@ -42,4 +42,6 @@ void Phys_Obj_Get_Linear_Velocity(phys_object_t *, vec3_t lin);
 void Phys_Obj_Set_Angular_Velocity(phys_object_t *, vec3_t ang);
 void Phys_Obj_Get_Angular_Velocity(phys_object_t *, vec3_t ang);
 
+void Phys_Obj_Weld(phys_object_t * A, phys_object_t * B);
+
 #endif //PHYS_PUBLIC_HPP

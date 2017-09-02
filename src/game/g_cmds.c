@@ -3628,6 +3628,92 @@ static void Cmd_Qui_f( gentity_t * ent ) {
 	G_Kill( ent );
 }
 
+static void Cmd_Poster_f( gentity_t * ent ) {
+	trace_t pos;
+	vec3_t start, mins, maxs, dir, end;
+	VectorCopy(ent->client->ps.origin, start);
+	start[2] += ent->client->ps.viewheight;
+	float boxs = 0.5f;
+	VectorSet(mins, -boxs, -boxs, -boxs);
+	VectorSet(maxs, boxs, boxs, boxs);
+	char shader[MAX_QPATH];
+	
+	if (trap->Argc() != 2) return;
+	trap->Argv(1, shader, MAX_QPATH);
+
+	dir[0] = cos(ent->client->ps.viewangles[PITCH] * (M_PI*2 / 360)) * cos(ent->client->ps.viewangles[YAW] * (M_PI*2 / 360));
+	dir[1] = cos(ent->client->ps.viewangles[PITCH] * (M_PI*2 / 360)) * sin(ent->client->ps.viewangles[YAW] * (M_PI*2 / 360));
+	dir[2] = -sin(ent->client->ps.viewangles[PITCH] * (M_PI*2 / 360));
+
+	float az, el;
+	el = ent->playerState->viewangles[PITCH];
+	az = ent->playerState->viewangles[YAW];
+	VectorSet(end, cos(el) * cos(az), cos(el) * sin(az), sin(el));
+
+	VectorMA(start, 100, dir, end);
+	trap->Trace(&pos, start, mins, maxs, end, ent->s.number, MASK_SOLID, qfalse, 0, 0);
+	if (VectorCompare(pos.endpos, end)) return;
+	//Com_Printf("PLACE SPRAY! W:%f H:%f\n", ent->client->spray_width, ent->client->spray_height);
+
+	vec3_t ang;
+	vectoangles(pos.plane.normal, ang);
+
+	gentity_t * from = NULL;
+	while ( (from = G_Find( from, FOFS(classname), "spray" )) != NULL ) {
+		if (from->s.owner == ent->client->ps.clientNum) {
+			G_FreeEntity(from);
+		}
+	}
+
+	gentity_t * pb = G_Spawn();
+	pb->classname = "spray";
+	VectorCopy(pos.endpos, pb->s.origin);
+	VectorCopy(pos.endpos, pb->s.pos.trBase);
+	VectorCopy(ang, pb->s.angles);
+	VectorCopy(ang, pb->s.apos.trBase);
+	pb->s.eType = ET_POSTER;
+	pb->s.owner = ent->playerState->clientNum;
+	pb->s.modelindex = G_ModelIndex(va("%s", shader));
+	Com_Printf("%s", shader);
+	pb->r.svFlags |= SVF_BROADCAST;
+	trap->LinkEntity((sharedEntity_t *) pb);
+}
+
+static phys_object_t * weld_A = NULL;
+static phys_object_t * weld_B = NULL;
+
+void Cmd_PhysWeld_f( gentity_t * ent ) { // FIXME -- if object is deleted before weld is completed, it will very likely crash
+	vec3_t dir, end;
+	phys_trace_t tr;
+	
+	dir[0] = cos(ent->client->ps.viewangles[PITCH] * (M_PI*2 / 360)) * cos(ent->client->ps.viewangles[YAW] * (M_PI*2 / 360));
+	dir[1] = cos(ent->client->ps.viewangles[PITCH] * (M_PI*2 / 360)) * sin(ent->client->ps.viewangles[YAW] * (M_PI*2 / 360));
+	dir[2] = -sin(ent->client->ps.viewangles[PITCH] * (M_PI*2 / 360));
+	VectorMA( ent->r.currentOrigin, 1000, dir, end);
+	trap->Phys_World_Trace(gworld, ent->r.currentOrigin, end, &tr);
+	if (!tr.hit_object) {
+		trap->SendServerCommand( ent-g_entities, "print \"weld: object not found in trace.\n\"" );
+		return;
+	}
+	if (!weld_A) {
+		weld_A = tr.hit_object;
+		trap->SendServerCommand( ent-g_entities, "print \"weld: now select a second object.\n\"" );
+		return;
+	}
+	if (!weld_B) {
+		if (tr.hit_object == weld_A) {
+			trap->SendServerCommand( ent-g_entities, "print \"weld: refusing to weld object to itself, select something else.\n\"" );
+			return;
+		}
+		weld_B = tr.hit_object;
+		
+		trap->Phys_Obj_Weld(weld_A, weld_B);
+		
+		weld_A = NULL;
+		weld_B = NULL;
+	}
+}
+
 /*
 =================
 ClientCommand
@@ -3676,6 +3762,7 @@ command_t commands[] = {
 	{ "noclip",				Cmd_Noclip_f,				CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "notarget",			Cmd_Notarget_f,				CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "npc",				Cmd_NPC_f,					CMD_CHEAT|CMD_ALIVE },
+	{ "poster",				Cmd_Poster_f,				CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "q",					Cmd_Q_f,					CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "qui",				Cmd_Qui_f,					CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "say",				Cmd_Say_f,					0 },
@@ -3696,6 +3783,7 @@ command_t commands[] = {
 	{ "t_use",				Cmd_TargetUse_f,			CMD_CHEAT|CMD_ALIVE },
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
+	{ "weld",				Cmd_PhysWeld_f,				CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
 };
 static const size_t numCommands = ARRAY_LEN( commands );

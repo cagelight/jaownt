@@ -314,6 +314,11 @@ static void CM_SubdivideGridColumns( cGrid_t *grid ) {
 		//
 		// we need to subdivide the curve
 		//
+		
+		// but only if it won't break the game
+		if (grid->width + 2 > MAX_GRID_SIZE) return;
+		if (grid->height + 2 > MAX_GRID_SIZE) return;
+		
 		for ( j = 0 ; j < grid->height ; j++ ) {
 			vec3_t	prev, mid, next;
 

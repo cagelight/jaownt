@@ -1983,6 +1983,7 @@ static userinfoValidate_t userinfoFields[] = {
 	UIF( teamtask,			0, 1 ), // optional
 	UIF( password,			0, 1 ), // optional
 	UIF( teamoverlay,		0, 1 ), // only registered in cgame, not sent when connecting
+	UIF( sprayshader,		0, 1 ),
 };
 static const size_t numUserinfoFields = ARRAY_LEN( userinfoFields );
 

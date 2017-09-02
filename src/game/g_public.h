@@ -762,6 +762,7 @@ typedef struct gameImport_s {
 	void 			(*Phys_Obj_Get_Linear_Velocity)		( phys_object_t *, vec3_t lin );
 	void			(*Phys_Obj_Set_Angular_Velocity)	( phys_object_t * obj, vec3_t ang );
 	void			(*Phys_Obj_Get_Angular_Velocity)	( phys_object_t * obj, vec3_t ang );
+	void 			(*Phys_Obj_Weld)					( phys_object_t * A, phys_object_t * B );
 
 } gameImport_t;
 

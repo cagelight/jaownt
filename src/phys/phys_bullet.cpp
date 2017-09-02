@@ -854,3 +854,10 @@ void Phys_Obj_Set_Angular_Velocity(phys_object_t * obj, vec3_t ang) {
 void Phys_Obj_Get_Angular_Velocity(phys_object_t * obj, vec3_t ang) {
 	bt2q3_vec3(obj->body->getAngularVelocity(), ang);
 }
+
+void Phys_Obj_Weld(phys_object_t * A, phys_object_t * B) {
+	btTransform tA = btTransform {btQuaternion {0, 0, 0, 1}, btVector3 {0, 0, 0}};
+	btTransform tB = btTransform {btQuaternion {0, 0, 0, 1}, A->body->getWorldTransform().getOrigin() - B->body->getWorldTransform().getOrigin()};
+	btFixedConstraint * cons = new btFixedConstraint(*A->body, *B->body, tA, tB);
+	A->parent->addConstraint(cons, true);
+}

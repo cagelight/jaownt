@@ -87,7 +87,7 @@ typedef struct patchCollide_s {
 	facet_t	*facets;
 } patchCollide_t;
 
-#define	MAX_GRID_SIZE	129
+#define	MAX_GRID_SIZE	512
 
 typedef struct cGrid_s {
 	int			width;

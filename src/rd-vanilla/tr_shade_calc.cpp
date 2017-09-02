@@ -1050,11 +1050,11 @@ void RB_CalcRotateTexCoords( float degsPerSecond, float *st )
 	float sinValue, cosValue;
 	texModInfo_t tmi;
 
-	degs = -degsPerSecond * timeScale;
-	index = degs * ( FUNCTABLE_SIZE / 360.0f );
+	degs = M_PI * (-degsPerSecond * timeScale) / 180.0f;
+	//index = degs * ( FUNCTABLE_SIZE / 360.0f );
 
-	sinValue = tr.sinTable[ index & FUNCTABLE_MASK ];
-	cosValue = tr.sinTable[ ( index + FUNCTABLE_SIZE / 4 ) & FUNCTABLE_MASK ];
+	sinValue = sin(degs); //tr.sinTable[ index & FUNCTABLE_MASK ];
+	cosValue = cos(degs); //tr.sinTable[ ( index + FUNCTABLE_SIZE / 4 ) & FUNCTABLE_MASK ];
 
 	tmi.matrix[0][0] = cosValue;
 	tmi.matrix[1][0] = -sinValue;
