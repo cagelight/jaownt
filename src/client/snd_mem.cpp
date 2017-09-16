@@ -4,18 +4,14 @@ Copyright (C) 1999 - 2005, Id Software, Inc.
 Copyright (C) 2000 - 2013, Raven Software, Inc.
 Copyright (C) 2001 - 2013, Activision, Inc.
 Copyright (C) 2013 - 2015, OpenJK contributors
-
 This file is part of the OpenJK source code.
-
 OpenJK is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License version 2 as
 published by the Free Software Foundation.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License
 along with this program; if not, see <http://www.gnu.org/licenses/>.
 ===========================================================================
@@ -36,9 +32,7 @@ extern int s_UseOpenAL;
 #endif
 /*
 ===============================================================================
-
 WAV loading
-
 ===============================================================================
 */
 
@@ -203,7 +197,6 @@ wavinfo_t GetWavinfo (const char *name, byte *wav, int wavlength)
 /*
 ================
 ResampleSfx
-
 resample / decimate to the current source rate
 ================
 */
@@ -723,7 +716,6 @@ static qboolean S_LoadSound_DirIsAllowedToKeepMP3s(const char *psFilename)
 /*
 ==============
 S_LoadSound
-
 The filename may be different than sfx->name in the case
 of a forced fallback of a player specific sound	(or of a wav/mp3 substitution now -Ste)
 ==============
@@ -907,7 +899,6 @@ static qboolean S_LoadSound_Actual( sfx_t *sfx )
 /*		if ( info.width == 1 ) {
 			Com_Printf(S_COLOR_YELLOW "WARNING: %s is a 8 bit wav file\n", sLoadName);
 		}
-
 		if ( info.rate != 22050 ) {
 			Com_Printf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz wav file\n", sLoadName);
 		}

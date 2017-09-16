@@ -1321,8 +1321,10 @@ void hurt_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 }
 
 void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
-	int		dflags;
+	//Prevent god mode from taking damage
+	if (other->flags & FL_GODMODE) return;
 
+	int		dflags;
 	if (level.gametype == GT_SIEGE && self->team && self->team[0])
 	{
 		int team = atoi(self->team);
@@ -1504,6 +1506,9 @@ causes human clients to suffocate and have no gravity.
 */
 void SP_trigger_space(gentity_t *self)
 {
+	//Prevent god mode from taking damage
+	if (self->flags & FL_GODMODE) return;
+
 	InitTrigger(self);
 	self->r.contents = CONTENTS_TRIGGER;
 

@@ -4442,6 +4442,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	if (!targ)
 		return;
 
+	//If the player is god, do not damage them
+	if (targ->flags & FL_GODMODE) return;
+
 	if (targ && targ->damageRedirect)
 	{
 		G_Damage(&g_entities[targ->damageRedirectTo], inflictor, attacker, dir, point, damage, dflags, mod);

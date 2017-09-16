@@ -6345,9 +6345,12 @@ rest:
 	return qfalse; // continue with the rest of the weapon code
 }
 
+/*
+Commented this out because these values are now cvars
 
 #define BOWCASTER_CHARGE_UNIT	200.0f	// bowcaster charging gives us one more unit every 200ms--if you change this, you'll have to do the same in g_weapon
 #define BRYAR_CHARGE_UNIT		200.0f	// bryar charging gives us one more unit every 200ms--if you change this, you'll have to do the same in g_weapon
+*/
 
 int PM_ItemUsable(playerState_t *ps, int forcedUse)
 {
