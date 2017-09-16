@@ -115,10 +115,10 @@ BRYAR PISTOL
 static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire )
 //---------------------------------------------------------
 {
-	int damage = weap_bryarPistolDamage.integer;
+	int damage = (altFire ? weap_bryarPistolAltDamage.integer : weap_bryarPistolDamage.integer);
 	int count;
 
-	gentity_t	*missile = CreateMissile( muzzle, forward, weap_bryarPistolVelocity.value, g_projectilelife.integer, ent, altFire );
+	gentity_t	*missile = CreateMissile( muzzle, forward, altFire ? weap_bryarPistolAltVelocity.value : weap_bryarPistolVelocity.value, altFire ? weap_bryarPistolAltProjectileLife.value * 1000 : weap_bryarPistolProjectileLife.value * 1000, ent, altFire );
 
 	missile->classname = "bryar_proj";
 	missile->s.weapon = WP_BRYAR_PISTOL;
@@ -149,7 +149,7 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire )
 
 		missile->s.generic1 = count; // The missile will then render according to the charge level.
 
-		boxSize = weap_bryarPistolAltFireSize.value*(count*0.5);
+		boxSize = weap_bryarPistolHitboxSize.value*(count*0.5);
 
 		VectorSet( missile->r.maxs, boxSize, boxSize, boxSize );
 		VectorSet( missile->r.mins, -boxSize, -boxSize, -boxSize );
@@ -167,12 +167,12 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire )
 	}
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 	
-	if (weap_bryarPistolBouncy.integer) {
+	if (altFire ? weap_bryarPistolAltBouncy.integer : weap_bryarPistolBouncy.integer) {
 		missile->flags |= FL_BOUNCE;
 	}
 
 	// we don't want it to bounce forever
-	missile->bounceCount = weap_bryarPistolBounceCount.integer;
+	missile->bounceCount = (altFire ? weap_bryarPistolAltBounceCount.integer : weap_bryarPistolBounceCount.integer);
 }
 
 /*
@@ -295,16 +295,18 @@ BLASTER
 void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qboolean altFire )
 //---------------------------------------------------------
 {
-	int velocity	= weap_e11Velocity.value;
-	int	damage		= weap_e11Damage.integer;
+	int velocity	= (altFire ? weap_e11AltVelocity.value : weap_e11Velocity.value);
+	int	damage		= (altFire ? weap_e11AltDamage.integer : weap_e11Damage.integer);
 	gentity_t *missile;
 
+	/* Pointless. -nab622
 	if (ent->s.eType == ET_NPC)
 	{ //animent
 		damage = 10;
 	}
+	*/
 
-	missile = CreateMissile( start, dir, velocity, g_projectilelife.integer, ent, altFire );
+	missile = CreateMissile( start, dir, velocity, altFire ? weap_e11AltProjectileLife.value * 1000 : weap_e11ProjectileLife.value * 1000, ent, altFire );
 
 	missile->classname = "blaster_proj";
 	missile->s.weapon = WP_BLASTER;
@@ -314,12 +316,12 @@ void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qboolean a
 	missile->methodOfDeath = MOD_BLASTER;
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 	
-	if (weap_e11Bouncy.integer) {
+	if ((altFire ? weap_e11AltBouncy.integer : weap_e11Bouncy.integer)) {
 		missile->flags |= FL_BOUNCE;
 	}
 
-	// we don't want it to bounce forever
-	missile->bounceCount = weap_e11BounceCount.integer;
+	// we may not want it to bounce forever
+	missile->bounceCount = (altFire ? weap_e11AltBounceCount.integer : weap_e11BounceCount.integer);
 }
 
 //---------------------------------------------------------
@@ -876,7 +878,7 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 {
 	int	damage	= weap_bowcasterDamage.integer;
 
-	gentity_t *missile = CreateMissile( muzzle, forward, weap_bowcasterVelocity.value, g_projectilelife.integer, ent, qfalse);
+	gentity_t *missile = CreateMissile( muzzle, forward, weap_bowcasterVelocity.value, weap_bowcasterAltProjectileLife.value * 1000, ent, qfalse);
 
 	missile->classname = "bowcaster_proj";
 	missile->s.weapon = WP_BOWCASTER;
@@ -927,6 +929,8 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		count--;
 	}
 
+/*	Commenting this out because it's a dumb idea IMO. Makes the bowcaster completely useless -nab622
+	
 	//scale the damage down based on how many are about to be fired
 	if (count <= 1)
 	{
@@ -948,6 +952,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 	{
 		damage = 30;
 	}
+*/
 
 	for (i = 0; i < count; i++ )
 	{
@@ -962,7 +967,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 
 		AngleVectors( angs, dir, NULL, NULL );
 
-		missile = CreateMissile( muzzle, dir, vel, g_projectilelife.integer, ent, qtrue );
+		missile = CreateMissile( muzzle, dir, vel, weap_bowcasterProjectileLife.value * 1000, ent, qtrue );
 
 		missile->classname = "bowcaster_alt_proj";
 		missile->s.weapon = WP_BOWCASTER;
@@ -1010,7 +1015,7 @@ static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir )
 {
 	int	damage	= weap_repeaterDamage.integer;
 
-	gentity_t *missile = CreateMissile( muzzle, dir, weap_repeaterVelocity.value, g_projectilelife.integer, ent, qfalse );
+	gentity_t *missile = CreateMissile( muzzle, dir, weap_repeaterVelocity.value, weap_repeaterProjectileLife.value * 1000, ent, qfalse );
 
 	missile->classname = "repeater_proj";
 	missile->s.weapon = WP_REPEATER;
@@ -1034,7 +1039,7 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 {
 	int	damage	= weap_repeaterAltDamage.integer;
 
-	gentity_t *missile = CreateMissile( muzzle, forward, weap_repeaterAltVelocity.value, g_projectilelife.integer, ent, qtrue );
+	gentity_t *missile = CreateMissile( muzzle, forward, weap_repeaterAltVelocity.value, weap_repeaterAltProjectileLife.value * 1000, ent, qtrue );
 
 	missile->classname = "repeater_alt_proj";
 	missile->s.weapon = WP_REPEATER;
@@ -1103,7 +1108,7 @@ static void WP_DEMP2_MainFire( gentity_t *ent )
 {
 	int	damage	= weap_demp2Damage.integer;
 
-	gentity_t *missile = CreateMissile( muzzle, forward, weap_demp2Velocity.value, g_projectilelife.integer, ent, qfalse);
+	gentity_t *missile = CreateMissile( muzzle, forward, weap_demp2Velocity.value, weap_demp2ProjectileLife.value * 1000, ent, qfalse);
 
 	missile->classname = "demp2_proj";
 	missile->s.weapon = WP_DEMP2;
@@ -1410,7 +1415,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 
 		AngleVectors( angs, fwd, NULL, NULL );
 
-		missile = CreateMissile( muzzle, fwd, weap_flechetteVelocity.value, g_projectilelife.integer, ent, qfalse);
+		missile = CreateMissile( muzzle, fwd, weap_flechetteVelocity.value, q_flrand(weap_flechetteMinLife.value * 1000, weap_flechetteMaxLife.value * 1000), ent, qfalse);
 
 		missile->classname = "flech_proj";
 		missile->s.weapon = WP_FLECHETTE;
@@ -1641,7 +1646,7 @@ void rocketThink( gentity_t *ent )
 	{//no enemy or enemy not a client or enemy dead or enemy cloaked
 		if ( !ent->genericValue1  )
 		{//doesn't have its own self-kill time
-			ent->nextthink = level.time + g_projectilelife.integer;
+			ent->nextthink = level.time + weap_rocketProjectileLife.value * 1000;
 			ent->think = G_FreeEntity;
 		}
 		return;
@@ -3225,7 +3230,7 @@ static void WP_FireConcussion( gentity_t *ent )
 	VectorCopy( muzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
-	missile = CreateMissile( start, forward, vel, g_projectilelife.integer, ent, qfalse );
+	missile = CreateMissile( start, forward, vel, weap_concussionProjectileLife.value * 1000, ent, qfalse );
 
 	missile->classname = "conc_proj";
 	missile->s.weapon = WP_CONCUSSION;
