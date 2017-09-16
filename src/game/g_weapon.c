@@ -166,6 +166,10 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire )
 		missile->methodOfDeath = MOD_BRYAR_PISTOL;
 	}
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
+	
+	if (weap_bryarPistolBouncy.integer) {
+		missile->flags |= FL_BOUNCE;
+	}
 
 	// we don't want it to bounce forever
 	missile->bounceCount = weap_bryarPistolBounceCount.integer;
@@ -309,6 +313,10 @@ void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qboolean a
 	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 	missile->methodOfDeath = MOD_BLASTER;
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
+	
+	if (weap_e11Bouncy.integer) {
+		missile->flags |= FL_BOUNCE;
+	}
 
 	// we don't want it to bounce forever
 	missile->bounceCount = weap_e11BounceCount.integer;
@@ -1011,6 +1019,10 @@ static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir )
 	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 	missile->methodOfDeath = MOD_REPEATER;
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
+	
+	if (weap_repeaterBouncy.integer) {
+		missile->flags |= FL_BOUNCE;
+	}
 
 	// we don't want it to bounce forever
 	missile->bounceCount = weap_repeaterBounceCount.integer;
@@ -1044,6 +1056,10 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 	else
 	{
 		missile->splashRadius = weap_repeaterAltSplashRadius.value;
+	}
+	
+	if (weap_repeaterAltBouncy.integer) {
+		missile->flags |= FL_BOUNCE;
 	}
 
 	// BOUNCE YOU BEACH BALL, BOUNCE
@@ -1098,6 +1114,10 @@ static void WP_DEMP2_MainFire( gentity_t *ent )
 	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 	missile->methodOfDeath = MOD_DEMP2;
 	missile->clipmask = MASK_SHOT;
+	
+	if (weap_demp2Bouncy.integer) {
+		missile->flags |= FL_BOUNCE;
+	}
 
 	// we do want it to ever bounce
 	missile->bounceCount = weap_demp2BounceCount.integer;
@@ -1504,7 +1524,7 @@ void WP_flechette_alt_blow( gentity_t *ent )
 static void WP_CreateFlechetteBouncyThing( vec3_t start, vec3_t fwd, gentity_t *self )
 //------------------------------------------------------------------------------
 {
-	gentity_t	*missile = CreateMissile( start, fwd, Q_flrand(weap_flechetteAltMinVelocity.value, weap_flechetteAltMaxVelocity.value), Q_flrand(weap_flechetteAltMinLife.value * 1000, weap_flechetteAltMaxLife.value * 1000), self, qtrue );
+	gentity_t	*missile = CreateMissile( start, fwd, Q_frandrange(weap_flechetteAltMinVelocity.value, weap_flechetteAltMaxVelocity.value), Q_frandrange(weap_flechetteAltMinLife.value * 1000, weap_flechetteAltMaxLife.value * 1000), self, qtrue );
 
 	missile->think = WP_flechette_alt_blow;
 
@@ -3224,6 +3244,10 @@ static void WP_FireConcussion( gentity_t *ent )
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 	missile->splashDamage = weap_concussionSplashDamage.integer;
 	missile->splashRadius = weap_concussionSplashRadius.value;
+	
+	if (weap_concussionBouncy.integer) {
+		missile->flags |= FL_BOUNCE;
+	}
 
 	// we want it to bounce for all teh epic funz
 	missile->bounceCount = weap_concussionBounceCount.value;

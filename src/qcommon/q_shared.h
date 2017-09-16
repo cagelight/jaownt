@@ -965,6 +965,7 @@ float Q_asin(float c);
 int		Q_rand( int *seed );
 float	Q_random( int *seed );
 float	Q_crandom( int *seed );
+float	Q_frandrange(float min, float max);
 
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
