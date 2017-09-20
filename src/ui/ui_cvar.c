@@ -23,6 +23,11 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "ui_local.h"
 
+#define XCVAR_DECL
+    #include "ui_xcvar.h"
+    #include "game/bg_xcvar.h"
+#undef XCVAR_DECL
+
 //
 // Cvar callbacks
 //

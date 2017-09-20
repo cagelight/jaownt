@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "qcommon/q_shared.h"
 #include "bg_public.h"
 #include "bg_local.h"
+#include "bg_xcvar.h"
 
 
 // Muzzle point table...
@@ -427,42 +428,42 @@ void updateAmmoForceMax()
 
 void updateAmmoBlasterMax()
 {
-	ammoData[AMMO_BLASTER].max = ammo_forceMax.integer;
+	ammoData[AMMO_BLASTER].max = ammo_blasterMax.integer;
 }
 
 void updateAmmoPowercellMax()
 {
-	ammoData[AMMO_POWERCELL].max = ammo_forceMax.integer;
+	ammoData[AMMO_POWERCELL].max = ammo_powercellMax.integer;
 }
 
 void updateAmmoMetalBoltsMax()
 {
-	ammoData[AMMO_METAL_BOLTS].max = ammo_forceMax.integer;
+	ammoData[AMMO_METAL_BOLTS].max = ammo_metalBoltsMax.integer;
 }
 
 void updateAmmoRocketsMax()
 {
-	ammoData[AMMO_ROCKETS].max = ammo_forceMax.integer;
+	ammoData[AMMO_ROCKETS].max = ammo_rocketsMax.integer;
 }
 
 void updateAmmoEmplacedMax()
 {
-	ammoData[AMMO_EMPLACED].max = ammo_forceMax.integer;
+	ammoData[AMMO_EMPLACED].max = ammo_emplacedMax.integer;
 }
 
 void updateAmmoThermalMax()
 {
-	ammoData[AMMO_THERMAL].max = ammo_forceMax.integer;
+	ammoData[AMMO_THERMAL].max = ammo_thermalMax.integer;
 }
 
 void updateAmmoTripmineMax()
 {
-	ammoData[AMMO_TRIPMINE].max = ammo_forceMax.integer;
+	ammoData[AMMO_TRIPMINE].max = ammo_tripmineMax.integer;
 }
 
 void updateAmmoDetpackMax()
 {
-	ammoData[AMMO_DETPACK].max = ammo_forceMax.integer;
+	ammoData[AMMO_DETPACK].max = ammo_detpackMax.integer;
 }
 
 
@@ -472,8 +473,72 @@ int checkAmmoIndex(int ammoIndex)
 	return ammoIndex;
 }
 
+void Upd_blasterAmmoIndex () {
+	weaponData[WP_BRYAR_OLD].ammoIndex = checkAmmoIndex(weap_blasterAmmoIndex.integer);
+}
+
+void Upd_bowcasterAmmoIndex () {
+	weaponData[WP_BOWCASTER].ammoIndex = checkAmmoIndex(weap_bowcasterAmmoIndex.integer);
+}
+
+void Upd_bryarPistolAmmoIndex () {
+	weaponData[WP_BRYAR_PISTOL].ammoIndex = checkAmmoIndex(weap_bryarPistolAmmoIndex.integer);
+}
+
+void Upd_concussionAmmoIndex () {
+	weaponData[WP_CONCUSSION].ammoIndex = checkAmmoIndex(weap_concussionAmmoIndex.integer);
+}
+
+void Upd_demp2AmmoIndex () {
+	weaponData[WP_DEMP2].ammoIndex = checkAmmoIndex(weap_demp2AmmoIndex.integer);
+}
+
+void Upd_detpackAmmoIndex () {
+	weaponData[WP_DET_PACK].ammoIndex = checkAmmoIndex(weap_detpackAmmoIndex.integer);
+}
+
+void Upd_disruptorAmmoIndex () {
+	weaponData[WP_DISRUPTOR].ammoIndex = checkAmmoIndex(weap_disruptorAmmoIndex.integer);
+}
+
 void Upd_e11AmmoIndex () {
 	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_e11AmmoIndex.integer);
+}
+
+void Upd_flechetteAmmoIndex () {
+	weaponData[WP_FLECHETTE].ammoIndex = checkAmmoIndex(weap_flechetteAmmoIndex.integer);
+}
+
+void Upd_forceAmmoIndex () {
+	weaponData[WP_SABER].ammoIndex = checkAmmoIndex(weap_forceAmmoIndex.integer);
+}
+
+void Upd_meleeAmmoIndex () {
+	weaponData[WP_MELEE].ammoIndex = checkAmmoIndex(weap_meleeAmmoIndex.integer);
+}
+
+void Upd_repeaterAmmoIndex () {
+	weaponData[WP_REPEATER].ammoIndex = checkAmmoIndex(weap_repeaterAmmoIndex.integer);
+}
+
+void Upd_rocketsAmmoIndex () {
+	weaponData[WP_ROCKET_LAUNCHER].ammoIndex = checkAmmoIndex(weap_rocketsAmmoIndex.integer);
+}
+
+void Upd_saberAmmoIndex () {
+	weaponData[WP_SABER].ammoIndex = checkAmmoIndex(weap_saberAmmoIndex.integer);
+}
+
+void Upd_stunBatonAmmoIndex () {
+	weaponData[WP_STUN_BATON].ammoIndex = checkAmmoIndex(weap_stunBatonAmmoIndex.integer);
+}
+
+void Upd_thermalAmmoIndex () {
+	weaponData[WP_THERMAL].ammoIndex = checkAmmoIndex(weap_thermalAmmoIndex.integer);
+}
+
+void Upd_tripmineAmmoIndex () {
+	weaponData[WP_TRIP_MINE].ammoIndex = checkAmmoIndex(weap_tripmineAmmoIndex.integer);
 }
 
 

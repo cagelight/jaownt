@@ -131,3 +131,7 @@ void updateAmmoTripmineMax();
 void updateAmmoDetpackMax();
 
 void Upd_e11AmmoIndex();
+
+#define XCVAR_PROTO
+    #include "bg_xcvar.h"
+#undef XCVAR_PROTO
