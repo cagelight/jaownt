@@ -21,6 +21,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 ===========================================================================
 */
 
+#include "bg_local.h"
 #include "cg_local.h"
 
 //

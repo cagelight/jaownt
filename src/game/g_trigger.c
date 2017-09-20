@@ -1464,6 +1464,9 @@ void SP_trigger_hurt( gentity_t *self ) {
 #define	INITIAL_SUFFOCATION_DELAY	500 //.5 seconds
 void space_touch( gentity_t *self, gentity_t *other, trace_t *trace )
 {
+	//Prevent god mode from taking damage or choking
+	if (self->flags & FL_GODMODE) return;
+
 	if (!other || !other->inuse || !other->client )
 		//NOTE: we need vehicles to know this, too...
 		//|| other->s.number >= MAX_CLIENTS)
@@ -1506,9 +1509,6 @@ causes human clients to suffocate and have no gravity.
 */
 void SP_trigger_space(gentity_t *self)
 {
-	//Prevent god mode from taking damage
-	if (self->flags & FL_GODMODE) return;
-
 	InitTrigger(self);
 	self->r.contents = CONTENTS_TRIGGER;
 

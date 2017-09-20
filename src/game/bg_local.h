@@ -120,3 +120,14 @@ void PM_SetForceJumpZStart(float value);
 
 void BG_CycleInven(playerState_t *ps, int direction);
 
+void updateAmmoForceMax();
+void updateAmmoBlasterMax();
+void updateAmmoPowercellMax();
+void updateAmmoMetalBoltsMax();
+void updateAmmoRocketsMax();
+void updateAmmoEmplacedMax();
+void updateAmmoThermalMax();
+void updateAmmoTripmineMax();
+void updateAmmoDetpackMax();
+
+void Upd_e11AmmoIndex();

@@ -57,6 +57,16 @@ float WP_SpeedOfMissileForWeapon( int wp, qboolean alt_fire )
 	return 500;
 }
 
+
+//-----------------------------------------------------------------------------
+float bg_superWeaponsValue(  )
+//-----------------------------------------------------------------------------
+{
+	//Need to make sure some goofball didn't set bg_superweapons to 0 before we go using it for division
+	if (!bg_superweapons.value) return FLT_EPSILON;
+	else return bg_superweapons.value;
+}
+
 //-----------------------------------------------------------------------------
 void W_TraceSetStart( gentity_t *ent, vec3_t start, vec3_t mins, vec3_t maxs )
 //-----------------------------------------------------------------------------
@@ -331,7 +341,8 @@ void WP_FireTurboLaserMissile( gentity_t *ent, vec3_t start, vec3_t dir )
 	int velocity	= ent->mass; //FIXME: externalize
 	gentity_t *missile;
 
-	missile = CreateMissile( start, dir, velocity, g_projectilelife.integer, ent, qfalse );
+	missile = CreateMissile( start, dir, velocity, weap_turbolaserProjectileLife.value * 1000, ent, qfalse );
+		//All other values for the turbolaser are found in g_turret_g2.c
 
 	//use a custom shot effect
 	missile->s.otherEntityNum2 = ent->genericValue14;
@@ -341,9 +352,9 @@ void WP_FireTurboLaserMissile( gentity_t *ent, vec3_t start, vec3_t dir )
 	missile->classname = "turbo_proj";
 	missile->s.weapon = WP_TURRET;
 
-	missile->damage = ent->damage;		//FIXME: externalize
-	missile->splashDamage = ent->splashDamage;	//FIXME: externalize
-	missile->splashRadius = ent->splashRadius;	//FIXME: externalize
+	missile->damage = ent->damage;
+	missile->splashDamage = ent->splashDamage;
+	missile->splashRadius = ent->splashRadius;
 	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 	missile->methodOfDeath = MOD_TURBLAST; //count as a heavy weap
 	missile->splashMethodOfDeath = MOD_TURBLAST;// ?SPLASH;
@@ -1415,7 +1426,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 
 		AngleVectors( angs, fwd, NULL, NULL );
 
-		missile = CreateMissile( muzzle, fwd, weap_flechetteVelocity.value, q_flrand(weap_flechetteMinLife.value * 1000, weap_flechetteMaxLife.value * 1000), ent, qfalse);
+		missile = CreateMissile( muzzle, fwd, weap_flechetteVelocity.value, Q_flrand(weap_flechetteMinLife.value * 1000, weap_flechetteMaxLife.value * 1000), ent, qfalse);
 
 		missile->classname = "flech_proj";
 		missile->s.weapon = WP_FLECHETTE;
@@ -1795,18 +1806,12 @@ void RocketDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 //---------------------------------------------------------
 {
-	int	damage	= weap_rocketDamage.integer;
-	int	vel = weap_rocketVelocity.value;
+	int	damage	= (altFire ? weap_rocketAltDamage.value * 1000 : weap_rocketDamage.value * 1000 );
 	int dif = 0;
 	float rTime;
 	gentity_t *missile;
 
-	if ( altFire )
-	{
-		vel *= 0.5f;
-	}
-
-	missile = CreateMissile( muzzle, forward, vel, g_projectilelife.integer * 3, ent, altFire );
+	missile = CreateMissile( muzzle, forward, altFire ? weap_rocketAltVelocity.integer : weap_rocketVelocity.integer, altFire ? weap_rocketAltProjectileLife.value * 1000 : weap_rocketProjectileLife.value * 1000, ent, altFire );
 
 	if (ent->client && ent->client->ps.rocketLockIndex != ENTITYNUM_NONE)
 	{
@@ -1846,7 +1851,7 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 	missile->s.weapon = WP_ROCKET_LAUNCHER;
 
 	// Make it easier to hit things
-	VectorSet( missile->r.maxs, weap_rocketHitboxSize.value, weap_rocketHitboxSize.value, weap_rocketHitboxSize.value );
+	VectorSet( missile->r.maxs, altFire ? weap_rocketAltHitboxSize.value, weap_rocketAltHitboxSize.value, weap_rocketAltHitboxSize.value : weap_rocketHitboxSize.value, weap_rocketHitboxSize.value, weap_rocketHitboxSize.value );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
 
 	missile->damage = damage;
@@ -1869,11 +1874,15 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 //===testing being able to shoot rockets out of the air==================================
 
 	missile->clipmask = MASK_SHOT;
-	missile->splashDamage = weap_rocketSplashDamage.integer;
-	missile->splashRadius = weap_rocketSplashRadius.value;
+	missile->splashDamage = (altFire ? weap_rocketAltSplashDamage.integer : weap_rocketSplashDamage.integer);
+	missile->splashRadius = (altFire ? weap_rocketAltSplashRadius.integer : weap_rocketSplashRadius.value);
+
+	if (( altFire ? weap_rocketAltBouncy.integer : weap_rocketBouncy.integer )) {
+		missile->flags |= FL_BOUNCE;
+	}
 
 	// we maybe do want it to ever bounce so let the server decide because they're smart and boucning rockets is funnie
-	missile->bounceCount = weap_rocketBounceCount.value;
+	missile->bounceCount = ( altFire ? weap_rocketAltBounceCount.value : weap_rocketBounceCount.value);
 }
 
 /*

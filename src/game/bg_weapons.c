@@ -26,6 +26,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "bg_public.h"
 #include "bg_local.h"
 
+
 // Muzzle point table...
 vec3_t WP_MuzzlePoint[WP_NUM_WEAPONS] =
 {//	Fwd,	right,	up.
@@ -418,5 +419,62 @@ ammoData_t ammoData[AMMO_MAX] =
 		10				//	int		max;		// Max amount player can hold of ammo
 	}
 };
+
+void updateAmmoForceMax()
+{
+	ammoData[AMMO_FORCE].max = ammo_forceMax.integer;
+}
+
+void updateAmmoBlasterMax()
+{
+	ammoData[AMMO_BLASTER].max = ammo_forceMax.integer;
+}
+
+void updateAmmoPowercellMax()
+{
+	ammoData[AMMO_POWERCELL].max = ammo_forceMax.integer;
+}
+
+void updateAmmoMetalBoltsMax()
+{
+	ammoData[AMMO_METAL_BOLTS].max = ammo_forceMax.integer;
+}
+
+void updateAmmoRocketsMax()
+{
+	ammoData[AMMO_ROCKETS].max = ammo_forceMax.integer;
+}
+
+void updateAmmoEmplacedMax()
+{
+	ammoData[AMMO_EMPLACED].max = ammo_forceMax.integer;
+}
+
+void updateAmmoThermalMax()
+{
+	ammoData[AMMO_THERMAL].max = ammo_forceMax.integer;
+}
+
+void updateAmmoTripmineMax()
+{
+	ammoData[AMMO_TRIPMINE].max = ammo_forceMax.integer;
+}
+
+void updateAmmoDetpackMax()
+{
+	ammoData[AMMO_DETPACK].max = ammo_forceMax.integer;
+}
+
+
+int checkAmmoIndex(int ammoIndex)
+{
+	if(ammoIndex >= AMMO_MAX || ammoIndex < 0) return 0;
+	return ammoIndex;
+}
+
+void Upd_e11AmmoIndex () {
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_e11AmmoIndex.integer);
+}
+
 
 

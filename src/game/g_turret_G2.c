@@ -1148,45 +1148,45 @@ void finish_spawning_turretG2( gentity_t *base )
 	{
 		if ( !base->random )
 		{//error worked into projectile direction
-			base->random = 2.0f;
+			base->random = weap_turbolaserSpread.integer;
 		}
 
 		if ( !base->mass )
 		{//misnomer: speed of projectile
-			base->mass = 20000;
+			base->mass = weap_turbolaserSpeed.value;
 		}
 
 		if ( !base->health )
 		{
-			base->health = 2000;
+			base->health = weap_turbolaserHealth.integer;
 		}
 
 		// search radius
 		if ( !base->radius )
 		{
-			base->radius = 32768;
+			base->radius = weap_turbolaserSearchRadius.value;
 		}
 
 		// How quickly to fire
 		if ( !base->wait )
 		{
-			base->wait = 1000;// + random() * 500;
+			base->wait = Q_flrand(weap_turbolaserCooldownMin.value, weap_turbolaserCooldownMax.value) * 1000 / bg_superWeaponsValue();
 		}
 
 		if ( !base->splashDamage )
 		{
-			base->splashDamage = 200;
+			base->splashDamage = weap_turbolaserSplashDamage.integer;
 		}
 
 		if ( !base->splashRadius )
 		{
-			base->splashRadius = 500;
+			base->splashRadius = weap_turbolaserSplashRadius.value;
 		}
 
 		// how much damage each shot does
 		if ( !base->damage )
 		{
-			base->damage = 500;
+			base->damage = weap_turbolaserDamage.integer;
 		}
 
 		if ( (base->spawnflags&SPF_TURRETG2_TURBO) )
@@ -1206,45 +1206,45 @@ void finish_spawning_turretG2( gentity_t *base )
 	{
 		if ( !base->random )
 		{//error worked into projectile direction
-			base->random = 2.0f;
+			base->random = weap_turretSpread.value;
 		}
 
 		if ( !base->mass )
 		{//misnomer: speed of projectile
-			base->mass = 1100;
+			base->mass = weap_turretSpeed.value;
 		}
 
 		if ( !base->health )
 		{
-			base->health = 100;
+			base->health = weap_turretHealth.integer;
 		}
 
 		// search radius
 		if ( !base->radius )
 		{
-			base->radius = 512;
+			base->radius = weap_turretSearchRadius.value;
 		}
 
 		// How quickly to fire
 		if ( !base->wait )
 		{
-			base->wait = 150 + random() * 55;
+			base->wait = Q_flrand(weap_turretCooldownMin.value, weap_turretCooldownMax.value) * 1000 / bg_superWeaponsValue();
 		}
 
 		if ( !base->splashDamage )
 		{
-			base->splashDamage = 10;
+			base->splashDamage = weap_turretSplashDamage.integer;
 		}
 
 		if ( !base->splashRadius )
 		{
-			base->splashRadius = 25;
+			base->splashRadius = weap_turretSplashRadius.value;
 		}
 
 		// how much damage each shot does
 		if ( !base->damage )
 		{
-			base->damage = 5;
+			base->damage = weap_turretDamage.integer;
 		}
 
 		if ( base->spawnflags & 2 )
