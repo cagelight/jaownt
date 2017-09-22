@@ -1426,7 +1426,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 
 		AngleVectors( angs, fwd, NULL, NULL );
 
-		missile = CreateMissile( muzzle, fwd, weap_flechetteVelocity.value, Q_flrand(weap_flechetteMinLife.value * 1000, weap_flechetteMaxLife.value * 1000), ent, qfalse);
+		missile = CreateMissile( muzzle, fwd, weap_flechetteVelocity.value * Q_frandrange(1 - weap_flechetteVelocitySpread.value, 1 + weap_flechetteVelocitySpread.value), (Q_frandrange(-weap_flechetteLifeSpread.value, weap_flechetteLifeSpread.value) + weap_flechetteLife.value) * 1000, ent, qfalse);
 
 		missile->classname = "flech_proj";
 		missile->s.weapon = WP_FLECHETTE;
@@ -1540,7 +1540,7 @@ void WP_flechette_alt_blow( gentity_t *ent )
 static void WP_CreateFlechetteBouncyThing( vec3_t start, vec3_t fwd, gentity_t *self )
 //------------------------------------------------------------------------------
 {
-	gentity_t	*missile = CreateMissile( start, fwd, Q_frandrange(weap_flechetteAltMinVelocity.value, weap_flechetteAltMaxVelocity.value), Q_frandrange(weap_flechetteAltMinLife.value * 1000, weap_flechetteAltMaxLife.value * 1000), self, qtrue );
+	gentity_t	*missile = CreateMissile( start, fwd, weap_flechetteAltVelocity.value * Q_frandrange(1 - weap_flechetteAltVelocitySpread.value, 1 + weap_flechetteAltVelocitySpread.value), (Q_frandrange(-weap_flechetteAltLifeSpread.value, weap_flechetteAltLifeSpread.value) + weap_flechetteAltLife.value) * 1000, self, qtrue );
 
 	missile->think = WP_flechette_alt_blow;
 
