@@ -126,3 +126,4 @@ extern ammoData_t ammoData[AMMO_MAX];
 #define DEFAULT_SHOTGUN_COUNT	11
 
 #define	LIGHTNING_RANGE		768
+

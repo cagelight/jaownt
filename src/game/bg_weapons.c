@@ -25,7 +25,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "qcommon/q_shared.h"
 #include "bg_public.h"
 #include "bg_local.h"
-#include "bg_xcvar.h"
 
 
 // Muzzle point table...
@@ -474,7 +473,7 @@ int checkAmmoIndex(int ammoIndex)
 }
 
 void Upd_blasterAmmoIndex () {
-	weaponData[WP_BRYAR_OLD].ammoIndex = checkAmmoIndex(weap_blasterAmmoIndex.integer);
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_blasterAmmoIndex.integer);
 }
 
 void Upd_bowcasterAmmoIndex () {
@@ -486,7 +485,7 @@ void Upd_bryarPistolAmmoIndex () {
 }
 
 void Upd_concussionAmmoIndex () {
-	weaponData[WP_CONCUSSION].ammoIndex = checkAmmoIndex(weap_concussionAmmoIndex.integer);
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_concussionAmmoIndex.integer);
 }
 
 void Upd_demp2AmmoIndex () {
@@ -494,7 +493,7 @@ void Upd_demp2AmmoIndex () {
 }
 
 void Upd_detpackAmmoIndex () {
-	weaponData[WP_DET_PACK].ammoIndex = checkAmmoIndex(weap_detpackAmmoIndex.integer);
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_detpackAmmoIndex.integer);
 }
 
 void Upd_disruptorAmmoIndex () {
@@ -506,11 +505,11 @@ void Upd_e11AmmoIndex () {
 }
 
 void Upd_flechetteAmmoIndex () {
-	weaponData[WP_FLECHETTE].ammoIndex = checkAmmoIndex(weap_flechetteAmmoIndex.integer);
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_flechetteAmmoIndex.integer);
 }
 
 void Upd_forceAmmoIndex () {
-	weaponData[WP_SABER].ammoIndex = checkAmmoIndex(weap_forceAmmoIndex.integer);
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_forceAmmoIndex.integer);
 }
 
 void Upd_meleeAmmoIndex () {
@@ -522,7 +521,7 @@ void Upd_repeaterAmmoIndex () {
 }
 
 void Upd_rocketsAmmoIndex () {
-	weaponData[WP_ROCKET_LAUNCHER].ammoIndex = checkAmmoIndex(weap_rocketsAmmoIndex.integer);
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_rocketsAmmoIndex.integer);
 }
 
 void Upd_saberAmmoIndex () {
@@ -534,11 +533,11 @@ void Upd_stunBatonAmmoIndex () {
 }
 
 void Upd_thermalAmmoIndex () {
-	weaponData[WP_THERMAL].ammoIndex = checkAmmoIndex(weap_thermalAmmoIndex.integer);
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_thermalAmmoIndex.integer);
 }
 
 void Upd_tripmineAmmoIndex () {
-	weaponData[WP_TRIP_MINE].ammoIndex = checkAmmoIndex(weap_tripmineAmmoIndex.integer);
+	weaponData[WP_BLASTER].ammoIndex = checkAmmoIndex(weap_tripmineAmmoIndex.integer);
 }
 
 
