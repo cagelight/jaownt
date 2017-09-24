@@ -127,3 +127,20 @@ extern ammoData_t ammoData[AMMO_MAX];
 
 #define	LIGHTNING_RANGE		768
 
+void Upd_blasterAmmoIndex();
+void Upd_bowcasterAmmoIndex();
+void Upd_bryarPistolAmmoIndex();
+void Upd_concussionAmmoIndex();
+void Upd_demp2AmmoIndex();
+void Upd_detpackAmmoIndex();
+void Upd_disruptorAmmoIndex();
+void Upd_e11AmmoIndex();
+void Upd_flechetteAmmoIndex();
+void Upd_forceAmmoIndex();
+void Upd_meleeAmmoIndex();
+void Upd_repeaterAmmoIndex();
+void Upd_rocketsAmmoIndex();
+void Upd_saberAmmoIndex();
+void Upd_stunBatonAmmoIndex();
+void Upd_thermalAmmoIndex();
+void Upd_tripmineAmmoIndex();

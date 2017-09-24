@@ -156,7 +156,11 @@ void G_BounceMissile( gentity_t *ent, trace_t *trace ) {
 	float	dot;
 	int		hitTime;
 
-	// reflect the velocity on the trace plane
+	if (!Q_stricmp(ent->classname, "conc_proj")) {
+        G_PlayEffectID(G_EffectIndex("concussion/explosion"), ent->r.currentOrigin, trace->plane.normal);
+    }
+    
+    // reflect the velocity on the trace plane
 	hitTime = level.previousTime + ( level.time - level.previousTime ) * trace->fraction;
 	BG_EvaluateTrajectoryDelta( &ent->s.pos, hitTime, velocity );
 	dot = DotProduct( velocity, trace->plane.normal );
@@ -208,6 +212,16 @@ void G_BounceMissile( gentity_t *ent, trace_t *trace ) {
 	{
 		ent->bounceCount--;
 	}
+
+	if (!Q_stricmp(ent->classname, "conc_proj") && weap_concussionBouncy.integer > 1) {
+        G_PlayEffectID(G_EffectIndex("concussion/explosion"), ent->r.currentOrigin, trace->plane.normal);
+        if( G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius,
+            NULL, ent, ent->splashMethodOfDeath ) ) {
+            if( g_entities[ent->r.ownerNum].client ) {
+                g_entities[ent->r.ownerNum].client->accuracy_hits++;
+            }
+        }
+    }
 }
 
 
