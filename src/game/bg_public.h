@@ -1049,17 +1049,6 @@ typedef enum {
 	GTS_TEAMS_ARE_TIED
 } global_team_sound_t;
 
-
-
-typedef enum {
-	TEAM_FREE,
-	TEAM_RED,
-	TEAM_BLUE,
-	TEAM_SPECTATOR,
-
-	TEAM_NUM_TEAMS
-} team_t;
-
 typedef enum {
 	DUELTEAM_FREE,
 	DUELTEAM_LONE,

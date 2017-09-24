@@ -7,7 +7,6 @@
 #define MP3STRUCT_H
 
 #include "small_header.h"	// for SAMPLE and IN_OUT
-#include "qcommon/q_shared.h"
 
 typedef void (*SBT_FUNCTION) (float *sample, short *pcm, int n);
 typedef void (*XFORM_FUNCTION) (void *pcm, int igr);
@@ -95,7 +94,7 @@ typedef struct
 
 	// stuff added now that the game uses streaming MP3s...
 	//
-	byte		*pbSourceData;			// a useful dup ptr only, this whole struct will be owned by an sfx_t struct that has the actual data ptr field
+	uint8_t		*pbSourceData;			// a useful dup ptr only, this whole struct will be owned by an sfx_t struct that has the actual data ptr field
 	int			iSourceBytesRemaining;
 	int			iSourceReadIndex;
 	int			iSourceFrameBytes;
@@ -109,7 +108,7 @@ typedef struct
 	int			iRewind_FinalConvertCode;
 	int			iRewind_SourceBytesRemaining;
 	int			iRewind_SourceReadIndex;
-	byte		bDecodeBuffer[2304*2];	// *2 to allow for stereo now
+	uint8_t		bDecodeBuffer[2304*2];	// *2 to allow for stereo now
 	int			iCopyOffset;			// used for painting to DMA-feeder, since 2304 won't match the size it wants
 
 	// some new stuff added for dynamic music, to allow "how many seconds left to play" queries...

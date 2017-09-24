@@ -35,7 +35,7 @@ qboolean minigame_tictactoe_cmdparse(minigameState_t * state, char const * cmd) 
 }
 
 char const * minigame_tictactoe_print(minigameState_t * state) {
-	minigame_tictactoe_data_t * sdat = state->data;
+	minigame_tictactoe_data_t * sdat = (minigame_tictactoe_data_t *)state->data;
 	return va( "%c|%c|%c\n-+-+-\n%c|%c|%c\n-+-+-\n%c|%c|%c",
 		sdat->board[0][0] == 0 ? ' ' : sdat->board[0][0] == 1 ? 'X' : 'O',
 		sdat->board[0][1] == 0 ? ' ' : sdat->board[0][1] == 1 ? 'X' : 'O',

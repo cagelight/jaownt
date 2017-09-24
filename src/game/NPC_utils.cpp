@@ -1704,9 +1704,9 @@ void NPC_CheckCharmed( void )
 
 	if ( NPCS.NPCInfo->charmedTime && NPCS.NPCInfo->charmedTime < level.time && NPCS.NPC->client )
 	{//we were charmed, set us back!
-		NPCS.NPC->client->playerTeam	= NPCS.NPC->genericValue1;
-		NPCS.NPC->client->enemyTeam		= NPCS.NPC->genericValue2;
-		NPCS.NPC->s.teamowner			= NPCS.NPC->genericValue3;
+		NPCS.NPC->client->playerTeam	= (npcteam_t)NPCS.NPC->genericValue1;
+		NPCS.NPC->client->enemyTeam		= (npcteam_t)NPCS.NPC->genericValue2;
+		NPCS.NPC->s.teamowner			= (team_t)NPCS.NPC->genericValue3;
 
 		NPCS.NPC->client->leader = NULL;
 		if ( NPCS.NPCInfo->tempBehavior == BS_FOLLOW_LEADER )

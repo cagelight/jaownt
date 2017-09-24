@@ -7,6 +7,8 @@
 #ifndef SMALL_HEADER_H
 #define SMALL_HEADER_H
 
+#include <stdint.h>
+typedef uint8_t byte;
 
 typedef union
 {

@@ -164,7 +164,9 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned long ulong;
 
-typedef enum qboolean_e { qfalse=0, qtrue } qboolean;
+typedef bool qboolean;
+#define qtrue true
+#define qfalse false
 
 #define Q_min(x,y) ((x)<(y)?(x):(y))
 #define Q_max(x,y) ((x)>(y)?(x):(y))
@@ -431,7 +433,6 @@ static inline long Q_ftol(float f)
 	return (long)f;
 }
 #endif
-
 
 typedef enum {
 	BLK_NO,
@@ -2076,6 +2077,15 @@ typedef struct trajectory_s {
 	vec3_t	trDelta;			// velocity, etc
 } trajectory_t;
 
+typedef enum {
+	TEAM_FREE,
+	TEAM_RED,
+	TEAM_BLUE,
+	TEAM_SPECTATOR,
+
+	TEAM_NUM_TEAMS
+} team_t;
+
 // entityState_t is the information conveyed from the server
 // in an update message about entities that the client will
 // need to render in some way
@@ -2156,7 +2166,7 @@ typedef struct entityState_s {
 
 	// so crosshair knows what it's looking at
 	int			owner;
-	int			teamowner;
+	team_t		teamowner;
 	qboolean	shouldtarget;
 
 	// for players
