@@ -511,7 +511,15 @@ void Cmd_TeamTask_f( gentity_t *ent ) {
 #endif
 
 void G_Kill( gentity_t *ent ) {
-	if ((level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) &&
+	if(ent->flags&FL_GODMODE) {
+		trap->SendServerCommand( ent-g_entities, "print \"You cannot kill a god!\n\"" );
+		return;
+	}
+	else {
+		if(ent->clipmask & CONTENTS_WATER) trap->SendServerCommand( ent-g_entities, "print \"You have died for everyone's sins!\n\"" );
+	}
+
+		if ((level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) &&
 		level.numPlayingClients > 1 && !level.warmupTime)
 	{
 		if (!g_allowDuelSuicide.integer)
@@ -537,6 +545,11 @@ void Cmd_Kill_f( gentity_t *ent ) {
 
 void Cmd_KillOther_f( gentity_t *ent )
 {
+	if(ent->flags&FL_GODMODE) {
+		trap->SendServerCommand( ent-g_entities, "print \"You cannot kill a god!\n\"" );
+		return;
+	}
+
 	int			i;
 	char		otherindex[MAX_TOKEN_CHARS];
 	gentity_t	*otherEnt = NULL;
@@ -3734,6 +3747,16 @@ int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((command_t*)b)->name );
 }
 
+void Cmd_Jesus_f( gentity_t * ent ) {
+    if (ent->clipmask & CONTENTS_WATER) {
+        ent->clipmask &= ~CONTENTS_WATER;
+        trap->SendServerCommand( ent-g_entities, "print \"You no longer feel like jesus.\n\"" );
+    } else {
+        ent->clipmask |= CONTENTS_WATER;
+        trap->SendServerCommand( ent-g_entities, "print \"You feel like jesus.\n\"" );
+    }
+}
+
 command_t commands[] = {
 	{ "addbot",				Cmd_AddBot_f,				0 },
 	{ "callteamvote",		Cmd_CallTeamVote_f,			CMD_NOINTERMISSION },
@@ -3753,6 +3776,7 @@ command_t commands[] = {
 	{ "give",				Cmd_Give_f,					CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "giveother",			Cmd_GiveOther_f,			CMD_CHEAT|CMD_NOINTERMISSION },
 	{ "god",				Cmd_God_f,					CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
+	{ "jesus",				Cmd_Jesus_f,				CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "kill",				Cmd_Kill_f,					CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "killother",			Cmd_KillOther_f,			CMD_CHEAT|CMD_NOINTERMISSION },
 //	{ "kylesmash",			TryGrapple,					0 },
@@ -3785,6 +3809,7 @@ command_t commands[] = {
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
 	{ "weld",				Cmd_PhysWeld_f,				CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
+	{ "wrist",				Cmd_Kill_f,					CMD_ALIVE|CMD_NOINTERMISSION },
 };
 static const size_t numCommands = ARRAY_LEN( commands );
 

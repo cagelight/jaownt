@@ -1302,6 +1302,7 @@ If dmg is set to -1 this brush will use the fade-kill method
 
 */
 void hurt_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+
 	if (activator && activator->inuse && activator->client)
 	{
 		self->activator = activator;
@@ -1321,6 +1322,10 @@ void hurt_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 }
 
 void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
+
+	//If god mode is active, do not hurt
+	if(other->flags&FL_GODMODE) return;
+
 	int		dflags;
 
 	if (level.gametype == GT_SIEGE && self->team && self->team[0])
@@ -1434,6 +1439,9 @@ void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 void SP_trigger_hurt( gentity_t *self ) {
 	InitTrigger (self);
 
+	//If god mode is active, do not hurt
+	if(self->flags&FL_GODMODE) return;
+
 	gTrigFallSound = G_SoundIndex("*falling1.wav");
 
 	self->noise_index = G_SoundIndex( "sound/weapons/force/speed.wav" );
@@ -1492,7 +1500,13 @@ void space_touch( gentity_t *self, gentity_t *other, trace_t *trace )
 	if (!other->client->inSpaceIndex ||
 		other->client->inSpaceIndex == ENTITYNUM_NONE)
 	{ //freshly entering space
+		//If god mode is active, do not choke
+		if(other->flags&FL_GODMODE) {
+			return;
+		}
+		else {
 		other->client->inSpaceSuffocation = level.time + INITIAL_SUFFOCATION_DELAY;
+		}
 	}
 
 	other->client->inSpaceIndex = self->s.number;
