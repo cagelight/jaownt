@@ -21,7 +21,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 ===========================================================================
 */
 
-#include "g_local.h"
+#include "bg_local.h"
 
 //
 // Cvar callbacks
@@ -84,7 +84,7 @@ void G_UpdateCvars( void ) {
 					cv->update();
 
 				if ( cv->trackChange )
-					trap->SendServerCommand( -1, va("print \"Server: %s changed to %s\n\"", cv->cvarName, cv->vmCvar->string ) );
+					trap->SendServerCommand( -1, va("print \"Server: %s changed to %i\n\"", cv->cvarName, cv->vmCvar->string ) );
 			}
 		}
 	}

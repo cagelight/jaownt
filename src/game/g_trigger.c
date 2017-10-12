@@ -1328,6 +1328,9 @@ void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 
 	int		dflags;
 
+	//Prevent god mode from taking damage
+	if (other->flags & FL_GODMODE) return;
+
 	if (level.gametype == GT_SIEGE && self->team && self->team[0])
 	{
 		int team = atoi(self->team);
@@ -1470,6 +1473,9 @@ void SP_trigger_hurt( gentity_t *self ) {
 #define	INITIAL_SUFFOCATION_DELAY	500 //.5 seconds
 void space_touch( gentity_t *self, gentity_t *other, trace_t *trace )
 {
+	//Prevent god mode from taking damage or choking
+	if (self->flags & FL_GODMODE) return;
+
 	if (!other || !other->inuse || !other->client )
 		//NOTE: we need vehicles to know this, too...
 		//|| other->s.number >= MAX_CLIENTS)

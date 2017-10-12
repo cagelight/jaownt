@@ -1584,4 +1584,6 @@ void G_Phys_Remove(gentity_t * ent);
 
 void G_TEST_PhysTestEnt(vec3_t pos);
 
+float bg_superWeaponsValue(  );
+
 extern gameImport_t *trap;

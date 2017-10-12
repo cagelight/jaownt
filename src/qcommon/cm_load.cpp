@@ -114,7 +114,7 @@ static void CMod_LoadShaders( const lump_t *l, clipMap_t &cm )
 	out = cm.shaders;
 	for ( i = 0; i < count; i++, in++, out++ )
 	{
-		Q_strncpyz(out->shader, in->shader, MAX_QPATH);
+        Q_strncpyz(out->shader, in->shader, MAX_QPATH);
 		out->contentFlags = LittleLong( in->contentFlags );
 		out->surfaceFlags = LittleLong( in->surfaceFlags );
 	}
