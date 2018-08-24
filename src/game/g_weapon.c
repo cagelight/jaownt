@@ -2762,6 +2762,7 @@ void charge_stick (gentity_t *self, gentity_t *other, trace_t *trace)
 	}
 	else if (other && other->s.number < ENTITYNUM_WORLD)
 	{ //hit an entity that we just want to explode on (probably another projectile or something)
+		/*
 		vec3_t v;
 
 		self->touch = 0;
@@ -2782,6 +2783,7 @@ void charge_stick (gentity_t *self, gentity_t *other, trace_t *trace)
 		self->think = G_FreeEntity;
 		self->nextthink = level.time;
 		return;
+		*/
 	}
 
 	//if we get here I guess we hit hte world so we can stick to it

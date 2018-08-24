@@ -413,6 +413,7 @@ struct gentity_s {
 	phys_object_t * phys;
 	phys_object_t * phys2; // used for ducking clients
 	qboolean phys_is_crouched;
+	vec3_t mover_delta;
 	/*
 	qboolean phys_post_do_vellerp;
 	vec3_t phys_post_target_velocity;

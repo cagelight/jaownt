@@ -157,7 +157,7 @@ def build(bld):
 		client = bld (
 			features = 'cxx cxxprogram',
 			target = 'jaownt',
-			includes = ['src'],
+			includes = ['src', '/usr/include/tirpc'],
 			source = clsv_common_files + client_files,
 			uselib = ['SDL', 'ZLIB', 'DL', 'PTHREAD', 'WS2', 'WMM', 'MONO', 'BULLET'],
 			use = ['minizip', 'botlib'],
@@ -175,7 +175,7 @@ def build(bld):
 		server = bld (
 			features = 'cxx cxxprogram',
 			target = 'jaowntded',
-			includes = ['src'],
+			includes = ['src', '/usr/include/tirpc'],
 			source = clsv_common_files + server_files,
 			defines = ['_CONSOLE', 'DEDICATED'],
 			uselib = ['ZLIB', 'DL', 'PTHREAD', 'WS2', 'MONO', 'BULLET'],

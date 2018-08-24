@@ -3778,6 +3778,8 @@ static void PM_CrashLand( void ) {
 	float		t;
 	float		a, b, c, den;
 	qboolean	didRoll = qfalse;
+	
+	return; //disabling this for now
 
 	// calculate the exact velocity on landing
 	dist = pm->ps->origin[2] - pml.previous_origin[2];
@@ -4208,12 +4210,14 @@ static void PM_GroundTrace( void ) {
 			return;
 	}
 	*/
+	
+	pml.walking = qtrue;
 
 	if (pm->ps->pm_type == PM_FLOAT || pm->ps->pm_type == PM_JETPACK)
 	{
 		PM_GroundTraceMissed();
 		pml.groundPlane = qfalse;
-		pml.walking = qfalse;
+		//pml.walking = qfalse;
 		return;
 	}
 
@@ -4221,7 +4225,7 @@ static void PM_GroundTrace( void ) {
 	if ( trace.fraction == 1.0 && ! ((pm->ps->eFlags & EF_ON_PHYS) != 0) ) {
 		PM_GroundTraceMissed();
 		pml.groundPlane = qfalse;
-		pml.walking = qfalse;
+		//pml.walking = qfalse;
 		return;
 	}
 
@@ -4241,7 +4245,7 @@ static void PM_GroundTrace( void ) {
 
 		pm->ps->groundEntityNum = ENTITYNUM_NONE;
 		pml.groundPlane = qfalse;
-		pml.walking = qfalse;
+		//pml.walking = qfalse;
 		return;
 	}
 
@@ -4252,7 +4256,7 @@ static void PM_GroundTrace( void ) {
 		}
 		pm->ps->groundEntityNum = ENTITYNUM_NONE;
 		pml.groundPlane = qtrue;
-		pml.walking = qfalse;
+		//pml.walking = qfalse;
 		return;
 	}
 

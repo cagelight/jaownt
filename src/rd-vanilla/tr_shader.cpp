@@ -346,6 +346,10 @@ static int NameToDstBlendMode( const char *name )
 	{
 		return GLS_DSTBLEND_ONE_MINUS_SRC_COLOR;
 	}
+	else if ( !Q_stricmp( name, "GL_ONE_MINUS_DST_COLOR" ) )
+	{
+		return GLS_DSTBLEND_ONE_MINUS_DST_COLOR;
+	}
 
 	ri->Printf( PRINT_ALL, S_COLOR_YELLOW  "WARNING: unknown blend mode '%s' in shader '%s', substituting GL_ONE\n", name, shader.name );
 	return GLS_DSTBLEND_ONE;
@@ -1238,12 +1242,14 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 				return qfalse;
 			}
 		}
+		
+		#define	MAX_IMAGE_ANIMATIONS 256
+		
 		//
 		// animMap <frequency> <image1> .... <imageN>
 		//
 		else if ( !Q_stricmp( token, "animMap" ) || !Q_stricmp( token, "clampanimMap" ) || !Q_stricmp( token, "oneshotanimMap" ))
 		{
-			#define	MAX_IMAGE_ANIMATIONS	256
 			image_t *images[MAX_IMAGE_ANIMATIONS];
 			bool bClamp = !Q_stricmp( token, "clampanimMap" );
 			bool oneShot = !Q_stricmp( token, "oneshotanimMap" );
@@ -2424,7 +2430,7 @@ static qboolean CollapseMultitexture( void ) {
 	int abits, bbits;
 	int i;
 	textureBundle_t tmpBundle;
-	if ( !qglActiveTextureARB ) {
+	if ( !glActiveTextureARB ) {
 		return qfalse;
 	}
 
@@ -2659,7 +2665,8 @@ static shader_t *GeneratePermanentShader( void ) {
 
 	if ( tr.numShaders == MAX_SHADERS ) {
 		//ri->Printf( PRINT_ALL, S_COLOR_YELLOW  "WARNING: GeneratePermanentShader - MAX_SHADERS hit\n");
-		ri->Printf( PRINT_ALL, "WARNING: GeneratePermanentShader - MAX_SHADERS hit\n");
+		//ri->Printf( PRINT_ALL, "ERROR: GeneratePermanentShader - MAX_SHADERS hit\n");
+		Com_Error( ERR_DROP, "ERROR: GeneratePermanentShader - MAX_SHADERS hit\n");
 		return tr.defaultShader;
 	}
 
@@ -2705,7 +2712,7 @@ static shader_t *GeneratePermanentShader( void ) {
 	}
 
 	SortNewShader();
-
+	
 	const int hash = generateHashValue(newShader->name, FILE_HASH_SIZE);
 	newShader->next = hashTable[hash];
 	hashTable[hash] = newShader;

@@ -9,9 +9,9 @@ using System.IO;
 namespace JAOWNT {
 
 	static class Nexus {
-
 		class Node {
 			internal Node(Assembly asm) {
+				List<int> q;
 				foreach (MethodInfo mi in asm.GetModules().SelectMany(x => x.GetTypes()).SelectMany(x => x.GetMethods()).Where(x => x.IsStatic)) {
 					foreach (object attrib in mi.GetCustomAttributes(true).Where(x => x.GetType().IsSubclassOf(typeof(GA.Event)))) {
 						if (attrib.GetType() == typeof(GA.EventInit)) {

@@ -336,6 +336,7 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 	trap->UnlinkEntity( (sharedEntity_t *)pusher );
 
 	// move the pusher to it's final position
+	VectorCopy ( move, pusher->mover_delta );
 	VectorAdd( pusher->r.currentOrigin, move, pusher->r.currentOrigin );
 	VectorAdd( pusher->r.currentAngles, amove, pusher->r.currentAngles );
 	trap->LinkEntity( (sharedEntity_t *)pusher );
@@ -618,6 +619,7 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 		//ent->s.eFlags &= ~EF_BLOCKED_MOVER;
 		break;
 	}
+	
 	BG_EvaluateTrajectory( &ent->s.pos, level.time, ent->r.currentOrigin );
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }

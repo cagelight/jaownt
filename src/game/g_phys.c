@@ -224,6 +224,12 @@ void G_Phys_UpdateEnt(gentity_t * ent) {
 		trap->Phys_Object_Set_Properties(ent->phys);
 		trap->Phys_Object_Set_Properties(ent->phys2);
 	case ET_NPC:
+		if (ent->playerState->eFlags & EF_ON_PHYS && ent->playerState->groundEntityNum != ENTITYNUM_WORLD) {
+			//Com_Printf("%f %f %f\n", g_entities[ent->playerState->groundEntityNum].mover_delta[0], g_entities[ent->playerState->groundEntityNum].mover_delta[1], g_entities[ent->playerState->groundEntityNum].mover_delta[2]);
+			//VectorAdd(ent->r.currentOrigin, g_entities[ent->playerState->groundEntityNum].mover_delta, ent->r.currentOrigin);
+			//VectorSubtract(ent->playerState->velocity, g_entities[ent->playerState->groundEntityNum].mover_delta, ent->playerState->velocity);
+		}
+		
 		VectorCopy(ent->r.currentOrigin, trans.origin);
 		VectorCopy(ent->r.currentAngles, trans.angles);
 		trap->Phys_Object_Set_Origin(ent->phys, trans.origin);
